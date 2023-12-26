@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer");
+const {AUTH_EMAIL, AUTH_PASSWORD} = process.env
 const sendEmail = async (email, subject, text) => {
   try {
     const transporter = nodemailer.createTransport({
@@ -7,18 +8,17 @@ const sendEmail = async (email, subject, text) => {
       port: 587,
       secure: false,
       auth: {
-        user: "x20journey@gmail.com",
-        pass: "aqucfwzwpkvomjma",
+        user: AUTH_EMAIL,
+        pass: AUTH_PASSWORD,
       },
     });
 
     await transporter.sendMail({
-      from: "hello cu",
+      from: "X20 Journey",
       to: email,
       subject: subject,
-      text: "Your new password is : " + text,
+      text: "Your code has been sent to email : " + text,
     });
-
     console.log("email sent sucessfully");
   } catch (error) {
     console.log(error, "email not sent");
