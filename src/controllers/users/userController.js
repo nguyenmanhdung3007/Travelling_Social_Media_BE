@@ -1,9 +1,9 @@
-const { User } = require("../models/user");
-const { Token } = require("../models/token");
-const { createJwtToken } = require("../util/auth");
+const { User } = require("../../models/user");
+const { Token } = require("../../models/token");
+const { createJwtToken } = require("../../util/auth");
 const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");
-const SendEmail = require("../util/sendEmail");
+const SendEmail = require("../../util/sendEmail");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
@@ -22,7 +22,7 @@ exports.register = async (req, res) => {
   try {
     user = await User.findOne({ email });
   } catch (err) {
-    // console.errors(err.message);
+    console.errors(err.message);
     res.status(500).send({ msg: "Server Error" });
   }
   if (user) {
@@ -133,7 +133,7 @@ exports.forgetPass = async (req, res) => {
     { password: newpass },
     { new: true }
   ).then((doc) => {
-    res.json({ status: true, msg: "Check your email to receive new password" });
+    res.json({ status: true, msg: "Check your email to receive new code" });
   });
 };
 
