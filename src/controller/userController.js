@@ -91,7 +91,7 @@ exports.login = async (req, res, next) => {
   } else {
     const token = req.headers.authorization.split(" ")[1];
     if (token) {
-      jwt.verify(token, "khanhlinh2000", function (err, decodedToken) {
+      jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decodedToken) {
         if (err) {
           return res.json({ status: "fail", msg: "Invalid token" });
         }
@@ -127,7 +127,7 @@ exports.forgetPass = async (req, res) => {
   const n = crypto.randomInt(100000, 999999);
   console.log(n);
   const newpass = await bcrypt.hash(n.toString(), 12);
-  await SendEmail(user.email, "Your new password", n);
+  await SendEmail(user.email, "Hello User", n);
   await User.findOneAndUpdate(
     { email: user.email },
     { password: newpass },
