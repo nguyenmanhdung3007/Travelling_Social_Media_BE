@@ -4,8 +4,12 @@ const express = require("express");
 const dotenv = require("dotenv");
 const PORT = process.env.PORT || 8000;
 
+const {connectDb} = require("./database/index")
+
 const app = express();
+app.use(express.json())
 dotenv.config();
+connectDb();
 
 const indexRoute = require("./routes/index");
 
