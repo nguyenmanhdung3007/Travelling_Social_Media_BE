@@ -11,7 +11,7 @@ const postSchema = new mongoose.Schema(
     content: { type: String },
     image: { type: String },
     // milestones: { type: Date },
-    likes: [{type: mongoose.Types.ObjectId, ref: "Users"}]
+    likes: [{type: mongoose.Types.ObjectId, ref: "Users"}],
     comments: [{type: mongoose.Types.ObjectId, ref: "Comments"}],
     // privacy: {
     //   type: String,
