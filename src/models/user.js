@@ -9,7 +9,6 @@ const basicInfo = new mongoose.Schema({
   dateOfBirth: { type: Date },
   age: { type: Number },
   gender: { type: String },
-  userInfo: String,
 });
 
 basicInfo.pre("save", async function (next) {

@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const { getAllUser } = require("../controllers/user");
 const userController = require("../controllers/users/userController");
 const {User} = require("../models/user");
 router.get("/", (req, res) => {
@@ -11,6 +12,9 @@ router.post("/login", userController.login);
 router.post("/forgetpass", userController.forgetPass);
 router.post("/changepass/:id", userController.userChangePass);
 // --- end user ----
+
+
+router.get("/get_all_user", getAllUser)
 
 // thong tin nguoi dung
 router.post("/userinfo", async (req, res) => {
