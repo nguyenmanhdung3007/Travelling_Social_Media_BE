@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const postSchema = new mongoose.Schema(
+const postModel = new mongoose.Schema(
   {
     postBy: { type: mongoose.Types.ObjectId, ref: "Users", required: true },
     vacation: {
@@ -23,4 +23,4 @@ const postSchema = new mongoose.Schema(
   { timestamp: true }
 );
 
-module.exports = mongoose.model("Posts", postSchema);
+module.exports = mongoose.model("Posts", postModel);

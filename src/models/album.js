@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const albumSchema = new mongoose.Schema(
+const albumModel = new mongoose.Schema(
   {
     createdBy: { type: mongoose.Types.ObjectId, ref: "Users", required: true },
     title: { type: String },
@@ -21,4 +21,4 @@ const albumSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Albums", albumSchema);
+module.exports = mongoose.model("Albums", albumModel);
