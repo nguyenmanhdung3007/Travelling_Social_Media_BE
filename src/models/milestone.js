@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const mileStoneSchema = new mongoose.Schema(
+const mileStoneModel = new mongoose.Schema(
   {
     time: {type: Date},
     desc: {type: String},
@@ -9,9 +9,9 @@ const mileStoneSchema = new mongoose.Schema(
       ref: "Vacations",
       required: true,
     },
-    posts: {type: mongoose.Types.ObjectId, ref: "Posts",}
+    posts: [{type: mongoose.Types.ObjectId, ref: "Posts",}]
   },
   { timestamp: true }
 );
 
-module.exports = mongoose.model("MileStones", mileStoneSchema);
+module.exports = mongoose.model("MileStones", mileStoneModel);

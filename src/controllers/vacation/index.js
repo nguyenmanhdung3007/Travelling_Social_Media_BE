@@ -1,9 +1,15 @@
 const vacationModel = require("../../models/vacation");
 const { vacationSchema } = require("../vacation/validation");
 
-const getAllVacation = async (req, res) => {
+const getAllVacations = async (req, res) => {
   try {
-  } catch (error) {}
+
+  } catch (error) {
+    console.log(error);
+    return res
+    .status(500)
+    .json({ message: "Đã xảy ra lỗi trong quá trình load kỳ nghỉ" });
+  }
 };
 
 const createVacation = async (req, res) => {

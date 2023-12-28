@@ -5,6 +5,8 @@ const basicInfo = new mongoose.Schema({
   email: { type: String, required: true },
   userName: { type: String, required: true },
   password: { type: String, required: true },
+  avatar: { type: String, required: true },
+  gender: { type: String, required: true},
 });
 
 const userInfo = new mongoose.Schema({

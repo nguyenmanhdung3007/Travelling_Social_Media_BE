@@ -2,14 +2,13 @@ const morgan = require("morgan");
 
 const express = require("express");
 const dotenv = require("dotenv");
+dotenv.config();
 const PORT = process.env.PORT || 8000;
 
-const {connectDb} = require("./database/index")
+// const {connectDb} = require("./database/index")
 
 const app = express();
-app.use(express.json())
-dotenv.config();
-connectDb();
+// connectDb();
 
 const connectionDB = require("./util/connectDB") 
 connectionDB();
