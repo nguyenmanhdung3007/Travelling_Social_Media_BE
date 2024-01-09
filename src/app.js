@@ -1,17 +1,12 @@
 const morgan = require("morgan");
-const multer  = require('multer')
 const express = require("express");
 const dotenv = require("dotenv");
 dotenv.config();
+const cors = require('cors')
 const PORT = process.env.PORT || 8000;
 
-// const {connectDb} = require("./database/index")
-
-const storage = multer.memoryStorage()
-const upload = multer({ storage: storage })
-
+app.use(cors({ origin: "*" }))
 const app = express();
-// connectDb();
 
 const connectionDB = require("./util/connectDB") 
 connectionDB();

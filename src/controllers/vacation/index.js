@@ -29,7 +29,7 @@ const getVacation = async (req, res) => {
 
 const getAllVacations = async (req, res) => {
   try {
-    const vacations = await vacationModel.find({});
+    const vacations = await vacationModel.find({}).populate;
 
     return res.status(200).json({ sucess: true, data: vacations });
   } catch (error) {
