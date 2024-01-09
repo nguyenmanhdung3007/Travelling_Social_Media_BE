@@ -9,7 +9,7 @@ const postModel = new mongoose.Schema(
       required: true,
     },
     content: { type: String },
-    images: [{ type: String }],
+    images: { type: String },
     // milestones: { type: Date },
     likes: [{type: mongoose.Types.ObjectId, ref: "Users"}],
     comments: [{type: mongoose.Types.ObjectId, ref: "Comments"}],

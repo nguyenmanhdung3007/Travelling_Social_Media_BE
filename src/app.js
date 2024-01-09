@@ -1,5 +1,5 @@
 const morgan = require("morgan");
-
+const multer  = require('multer')
 const express = require("express");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -7,9 +7,10 @@ const PORT = process.env.PORT || 8000;
 
 // const {connectDb} = require("./database/index")
 
+const storage = multer.memoryStorage()
+const upload = multer({ storage: storage })
+
 const app = express();
-app.use(express.json())
-dotenv.config();
 // connectDb();
 
 const connectionDB = require("./util/connectDB") 
