@@ -45,4 +45,17 @@ const createMileStone = async (req, res) => {
   }
 };
 
-module.exports = { createMileStone };
+const getMileStone = async (req, res) => {
+  
+};
+const getAllMileStone = async (req, res) => {};
+const updateMileStone = async (req, res) => {};
+const deleteMileStone = async (req, res) => {};
+
+module.exports = {
+  createMileStone,
+  getAllMileStone,
+  getMileStone,
+  updateMileStone,
+  deleteMileStone,
+};

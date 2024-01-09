@@ -1,11 +1,14 @@
+const { boolean } = require("joi");
 const mongoose = require("mongoose");
 
 const commentModel = new mongoose.Schema(
   {
     userId: { type: mongoose.Types.ObjectId, ref: "Users" },
-    postId: { type: mongoose.Types.ObjectId, ref: "Posts" },
+    fromId: { type: mongoose.Types.ObjectId },
+    isVacationId: { type: Boolean },
+    isPostId: { type: Boolean },
     comment: { type: String, required: true },
-    from: { type: String, required: true },
+    from: { type: String },
     replies: [
       {
         rid: { type: mongoose.Schema.Types.ObjectId },
@@ -23,4 +26,4 @@ const commentModel = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Comments", commentModel)
+module.exports = mongoose.model("Comments", commentModel);

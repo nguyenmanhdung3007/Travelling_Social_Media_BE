@@ -1,10 +1,13 @@
 const { createMileStone } = require("../controllers/milestone");
-const { createVacation } = require("../controllers/vacation");
+const { createVacation, updateVacation } = require("../controllers/vacation");
     
 const router = require("express").Router();
 
-router.post('/:id', createVacation)
+// router.post('/create/:id', createVacation)
+router.post('/create/', createVacation)
 
 router.post('/milestone/:id', createMileStone)
+
+router.patch('/:id', updateVacation)
 
 module.exports = router;
