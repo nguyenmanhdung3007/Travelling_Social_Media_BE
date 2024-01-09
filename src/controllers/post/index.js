@@ -4,7 +4,10 @@ const { postSchema } = require("../post/validation");
 const createPost = async (req, res) => {
   try {
     const userId = req.params.id;
-    const { vacation, content, images, likes, comments } = req.body;
+    const { vacation, content, likes, comments } = req.body;
+    const image = req.file;
+
+    const uploadImage = await uploadImage(image);
 
     const validate = postSchema.validate({
       content,
