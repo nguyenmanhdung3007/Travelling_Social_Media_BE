@@ -1,3 +1,4 @@
+const { uploadImage } = require("../../cloudinary");
 const postModel = require("../../models/post");
 const { postSchema } = require("../post/validation");
 
