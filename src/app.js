@@ -20,6 +20,9 @@ app.use(express.urlencoded({extended:false}))
 const indexRoute = require("./routes/index");
 const { connection } = require("mongoose");
 
+const cors = require("cors");
+app.use(cors({origin: "*" }));
+
 app.use("/", indexRoute);
 
 app.get("/", (req, res) => {
