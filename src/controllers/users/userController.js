@@ -91,23 +91,27 @@ exports.login = async (req, res, next) => {
   } else {
     const token = req.headers.authorization.split(" ")[1];
     if (token) {
-      jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decodedToken) {
-        if (err) {
-          return res.json({ status: "fail", msg: "Invalid token" });
-        }
-        User.findOne({ _id: decodedToken.userID }, (err, doc) => {
+      jwt.verify(
+        token,
+        process.env.JWT_SECRET_KEY,
+        function (err, decodedToken) {
           if (err) {
-            return res.json({ status: "fail", msg: "server error" });
-          } else if (doc) {
-            return res.json({
-              status: "success",
-              msg: "login successfully!",
-              token: token,
-              data: doc,
-            });
+            return res.json({ status: "fail", msg: "Invalid token" });
           }
-        });
-      });
+          User.findOne({ _id: decodedToken.userID }, (err, doc) => {
+            if (err) {
+              return res.json({ status: "fail", msg: "server error" });
+            } else if (doc) {
+              return res.json({
+                status: "success",
+                msg: "login successfully!",
+                token: token,
+                data: doc,
+              });
+            }
+          });
+        }
+      );
     }
   }
 };
@@ -127,7 +131,11 @@ exports.forgetPass = async (req, res) => {
   const n = crypto.randomInt(100000, 999999);
   console.log(n);
   const newpass = await bcrypt.hash(n.toString(), 12);
-  await SendEmail(user.email, "Hello User", n);
+  await SendEmail(
+    user.email,
+    "Hello User",
+    `${n}, Link: http://localhost:5173/changepass/${user._id}`
+  );
   await User.findOneAndUpdate(
     { email: user.email },
     { password: newpass },
@@ -169,6 +177,7 @@ exports.userChangePass = async (req, res) => {
         });
       }
     }
+    console.log("user");
   } catch (err) {
     console.error(err.message);
     res.status(500).send({ status: "fail", msg: "Server Error" });
