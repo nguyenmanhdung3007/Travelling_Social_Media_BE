@@ -11,7 +11,7 @@ const createPost = async (req, res) => {
 
     console.log(images);
     const data = await uploadImage(images);
-    console.log(data)
+    console.log(data);
 
     const validate = postSchema.validate({
       content,

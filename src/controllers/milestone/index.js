@@ -2,7 +2,7 @@ const mileStoneModel = require("../../models/milestone");
 const { milestoneSchema } = require("./validation");
 const vacationModel = require("../../models/vacation");
 
-const createMileStone = async (req, res) => {
+const createMileStone = async (req, res) => {   
   try {
     const vacationId = req.params.id;
     const { time, desc } = req.body;

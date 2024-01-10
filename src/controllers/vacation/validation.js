@@ -5,8 +5,8 @@ const vacationSchema = Joi.object({
   desc: Joi.string(),
   startedAt: Joi.date(),
   endedAt: Joi.date().greater(Joi.ref("startedAt")),
-  privacy: Joi.string(),
-  status: Joi.string(),
+  // privacy: Joi.string(),
+  // status: Joi.string(),
 });
 
 module.exports = { vacationSchema };

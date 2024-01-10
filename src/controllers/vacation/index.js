@@ -6,7 +6,7 @@ const { createMileStone } = require("../milestone");
 
 const getVacation = async (req, res) => {
   try {
-    const vacationId = req.params._id;
+    const vacationId = req.params.id;
 
     const vacation = await vacationModel
       .find(vacationId)
@@ -42,16 +42,17 @@ const getAllVacations = async (req, res) => {
 
 const createVacation = async (req, res) => {
   try {
-    // const userId = req.params.id;
+    const userId = req.params.id;
+    console.log(userId)
     const {
       title,
       desc,
       startedAt,
       endedAt,
-      privacy,
-      allowedUsers,
-      status,
-      participants,
+      // privacy,
+      // allowedUsers,
+      // status,
+      // participants,
       milestones,
     } = req.body;
 
@@ -60,8 +61,8 @@ const createVacation = async (req, res) => {
       desc,
       startedAt,
       endedAt,
-      privacy,
-      status,
+      // privacy,
+      // status,
     });
 
     if (validate.error) {
@@ -79,9 +80,9 @@ const createVacation = async (req, res) => {
       title,
       startedAt,
       endedAt,
-      privacy,
-      status,
-      participants,
+      // milestones,
+      // privacy,
+      // status,
     });
 
     if (milestones?.length != 0) {
