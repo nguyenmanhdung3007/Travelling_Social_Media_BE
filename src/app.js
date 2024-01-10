@@ -5,11 +5,11 @@ dotenv.config();
 const cors = require('cors')
 const PORT = process.env.PORT || 8000;
 
-app.use(cors({ origin: "*" }))
 const app = express();
 
 const connectionDB = require("./util/connectDB") 
 connectionDB();
+app.use(cors({ origin: "*" }))
 app.use(express.json());
 app.use(express.urlencoded({extended:false}))
 

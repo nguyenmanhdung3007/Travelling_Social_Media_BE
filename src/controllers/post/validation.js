@@ -1,8 +1,7 @@
-const Joi = require('joi')
+const Joi = require("joi");
 
 const postSchema = Joi.object({
-    content: Joi.string(),
-    images: Joi.array(),
-})
+  content: Joi.string(),
+});
 
-module.exports = {postSchema}
+module.exports = { postSchema };

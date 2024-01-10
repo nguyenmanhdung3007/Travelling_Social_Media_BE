@@ -3,9 +3,14 @@ const mongoose = require("mongoose");
 const postModel = new mongoose.Schema(
   {
     postBy: { type: mongoose.Types.ObjectId, ref: "Users", required: true },
-    vacation: {
+    // vacation: {
+    //   type: mongoose.Types.ObjectId,
+    //   ref: "Vacations",
+    //   required: true,
+    // },
+    milestone: {
       type: mongoose.Types.ObjectId,
-      ref: "Vacations",
+      ref: "Milestones",
       required: true,
     },
     content: { type: String },
@@ -20,7 +25,7 @@ const postModel = new mongoose.Schema(
     // },
     // allowedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Users" }],
   },
-  { timestamp: true }
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("Posts", postModel);
