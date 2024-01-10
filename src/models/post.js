@@ -1,15 +1,20 @@
 const mongoose = require("mongoose");
 
-const postSchema = new mongoose.Schema(
+const postModel = new mongoose.Schema(
   {
     postBy: { type: mongoose.Types.ObjectId, ref: "Users", required: true },
-    vacation: {
+    // vacation: {
+    //   type: mongoose.Types.ObjectId,
+    //   ref: "Vacations",
+    //   required: true,
+    // },
+    milestone: {
       type: mongoose.Types.ObjectId,
-      ref: "Vacations",
+      ref: "Milestones",
       required: true,
     },
     content: { type: String },
-    image: { type: String },
+    images: { type: String },
     // milestones: { type: Date },
     likes: [{type: mongoose.Types.ObjectId, ref: "Users"}],
     comments: [{type: mongoose.Types.ObjectId, ref: "Comments"}],
@@ -20,7 +25,7 @@ const postSchema = new mongoose.Schema(
     // },
     // allowedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Users" }],
   },
-  { timestamp: true }
+  { timestamps: true }
 );
 
-module.exports = mongoose.model("Posts", postSchema);
+module.exports = mongoose.model("Posts", postModel);
