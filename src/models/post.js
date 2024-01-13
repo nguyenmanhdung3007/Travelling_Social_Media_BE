@@ -16,7 +16,7 @@ const postModel = new mongoose.Schema(
     content: { type: String },
     images: { type: String },
     // milestones: { type: Date },
-    likes: [{type: mongoose.Types.ObjectId, ref: "Users"}],
+    likes: [{type: String}],
     comments: [{type: mongoose.Types.ObjectId, ref: "Comments"}],
     // privacy: {
     //   type: String,

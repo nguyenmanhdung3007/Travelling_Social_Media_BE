@@ -1,18 +1,18 @@
 const vacationModel = require("../../models/vacation");
-const mileStoneModel = require("../../models/milestone");
+const milestoneModel = require("../../models/milestone");
 const { vacationSchema } = require("../vacation/validation");
-const { createMileStone } = require("../milestone");
+const { createMilestone } = require("../milestone");
 
 const getVacation = async (req, res) => {
   try {
     const vacationId = req.params.id;
 
     const vacation = await vacationModel
-      .find(vacationId)
-      .populate({ path: "likes", select: "-password" })
+      .findById(vacationId)
+      .populate("comments")
       .populate("milestones")
       .populate({ path: "allowedUsers", select: "-password" })
-      .populate({ path: "paticipants", select: "-password" });
+      .populate({ path: "participants", select: "-password" });
 
     return res.status(200).json({
       sucess: true,
@@ -42,7 +42,6 @@ const getAllVacations = async (req, res) => {
 const createVacation = async (req, res) => {
   try {
     const userId = req.params.id;
-    console.log(userId)
     const {
       title,
       desc,
@@ -52,7 +51,7 @@ const createVacation = async (req, res) => {
       // allowedUsers,
       // status,
       participants,
-      mileStones,
+      milestones,
     } = req.body;
 
     const validate = vacationSchema.validate({
@@ -86,10 +85,10 @@ const createVacation = async (req, res) => {
       // status,
     });
 
-    if (mileStones?.length != 0) {
-      for (let i = 0; i < mileStones?.length; i++) {
+    if (milestones?.length != 0) {
+      for (let i = 0; i < milestones?.length; i++) {
         const vacationId = vacation._id;
-        const { time, desc } = mileStones[i];
+        const { time, desc } = milestones[i];
         if (
           new Date(time).getTime() > new Date(vacation.endedAt).getTime() ||
           new Date(time).getTime() < new Date(vacation.startedAt).getTime()
@@ -98,12 +97,12 @@ const createVacation = async (req, res) => {
             .status(400)
             .json({ message: "Thời gian nằm ngoài kỳ nghỉ. Hãy nhập lại" });
         }
-        const mileStone = await mileStoneModel.create({
+        const milestone = await milestoneModel.create({
           time,
           desc,
           vacation: vacationId,
         });
-        vacation.mileStones.push(mileStone);
+        vacation.milestones.push(milestone);
         await vacation.save();
       }
     }
@@ -209,6 +208,7 @@ const deleteVacation = async (req, res) => {
 };
 
 module.exports = {
+  getVacation,
   getAllVacations,
   createVacation,
   updateVacation,
