@@ -4,6 +4,7 @@ const {
   updateVacation,
   getAllVacations,
 } = require("../controllers/vacation");
+const upload = require("../util/multer");
 
 const router = require("express").Router();
 
