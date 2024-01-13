@@ -49,11 +49,11 @@ const createVacation = async (req, res) => {
       desc,
       startedAt,
       endedAt,
-      // privacy,
+      privacy,
       // allowedUsers,
       // status,
       // participants,
-      milestones,
+      mileStones,
     } = req.body;
 
     const validate = vacationSchema.validate({
@@ -75,20 +75,21 @@ const createVacation = async (req, res) => {
         .json({ message: "Ngày kết thúc không thể trước ngày bắt đầu." });
     }
 
+
     const vacation = await vacationModel.create({
       createdBy: userId,
+      desc,
       title,
       startedAt,
       endedAt,
-      // milestones,
       // privacy,
       // status,
     });
 
-    if (milestones?.length != 0) {
-      for (let i = 0; i < milestones?.length; i++) {
+    if (mileStones?.length != 0) {
+      for (let i = 0; i < mileStones?.length; i++) {
         const vacationId = vacation._id;
-        const { time, desc } = milestones[i];
+        const { time, desc } = mileStones[i];
         if (
           new Date(time).getTime() > new Date(vacation.endedAt).getTime() ||
           new Date(time).getTime() < new Date(vacation.startedAt).getTime()
@@ -102,7 +103,7 @@ const createVacation = async (req, res) => {
           desc,
           vacation: vacationId,
         });
-        vacation.milestones.push(mileStone);
+        vacation.mileStones.push(mileStone);
         await vacation.save();
       }
     }
