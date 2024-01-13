@@ -9,7 +9,7 @@ const vacationModel = new mongoose.Schema(
     endedAt: { type: Date },
     likes: [{ type: mongoose.Types.ObjectId, ref: "Users" }],
     comments: [{ type: mongoose.Types.ObjectId, ref: "Comments" }],
-    userTags: [{ type: mongoose.Types.ObjectId, ref: "Users" }],
+    // userTags: [{ type: mongoose.Types.ObjectId, ref: "Users" }],
     // posts: [{ type: mongoose.Types.ObjectId, ref: "Posts" }],
     mileStones: [{ type: mongoose.Types.ObjectId, ref: "Milestones" }],
     privacy: {
@@ -23,7 +23,7 @@ const vacationModel = new mongoose.Schema(
       enum: ["Intention", "In Progress", "Finished"],
       default: "In Progress",
     },
-    paticipants:[{type: mongoose.Types.ObjectId, ref: "Users"}]
+    participants:[{type: mongoose.Types.ObjectId, ref: "Users"}]
   },
   { timestamps: true }
 );
