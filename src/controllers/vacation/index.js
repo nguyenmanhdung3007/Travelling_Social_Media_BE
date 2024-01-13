@@ -1,4 +1,3 @@
-const { log } = require("console");
 const vacationModel = require("../../models/vacation");
 const mileStoneModel = require("../../models/milestone");
 const { vacationSchema } = require("../vacation/validation");
@@ -52,7 +51,7 @@ const createVacation = async (req, res) => {
       privacy,
       // allowedUsers,
       // status,
-      // participants,
+      participants,
       mileStones,
     } = req.body;
 
@@ -82,6 +81,7 @@ const createVacation = async (req, res) => {
       title,
       startedAt,
       endedAt,
+      participants,
       // privacy,
       // status,
     });
