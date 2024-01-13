@@ -2,6 +2,29 @@ const { log } = require("console");
 const { uploadImage } = require("../../cloudinary");
 const postModel = require("../../models/post");
 const { postSchema } = require("../post/validation");
+const milestoneModel = require("../../models/milestone");
+
+const getPost = async (req, res) => {
+  try {
+    const postId = req.params.id;
+
+    const post = await postModel
+      .findById(postId)
+      .populate("milestone")
+      .populate({ path: "postBy", select: "-password" })
+      .populate({ path: "comments", select: "-password" });
+
+    return res.status(200).json({
+      sucess: true,
+      data: post,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(404)
+      .json({ message: "Đã xảy ra lỗi trong quá trình load bài post" });
+  }
+};
 
 const createPost = async (req, res) => {
   try {
@@ -29,6 +52,11 @@ const createPost = async (req, res) => {
       images: data,
     });
 
+    const milestoneObj = await milestoneModel.findById(milestone);
+
+    milestoneObj.posts.push(post);
+    milestoneObj.save();
+
     return res.status(200).json({
       sucess: true,
       message: "Đã tạo bài viết thành công",
@@ -48,4 +76,4 @@ const likePost = async (req, res) => {
   const isLiked = post.likes;
 };
 
-module.exports = { createPost };
+module.exports = { createPost, getPost };

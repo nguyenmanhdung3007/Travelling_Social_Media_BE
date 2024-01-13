@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const mileStoneModel = new mongoose.Schema(
+const milestoneModel = new mongoose.Schema(
   {
     time: {type: Date},
     desc: {type: String},
@@ -14,4 +14,4 @@ const mileStoneModel = new mongoose.Schema(
   { timestamp: true }
 );
 
-module.exports = mongoose.model("MileStones", mileStoneModel);
+module.exports = mongoose.model("Milestones", milestoneModel);

@@ -7,11 +7,11 @@ const vacationModel = new mongoose.Schema(
     desc: { type: String },
     startedAt: { type: Date },
     endedAt: { type: Date },
-    likes: [{ type: mongoose.Types.ObjectId, ref: "Users" }],
+    likes: [{type: String}],
     comments: [{ type: mongoose.Types.ObjectId, ref: "Comments" }],
     // userTags: [{ type: mongoose.Types.ObjectId, ref: "Users" }],
     // posts: [{ type: mongoose.Types.ObjectId, ref: "Posts" }],
-    mileStones: [{ type: mongoose.Types.ObjectId, ref: "Milestones" }],
+    milestones: [{ type: mongoose.Types.ObjectId, ref: "Milestones" }],
     privacy: {
       type: String,
       enum: ["onlyMe", "allowedUsers", "public"],
