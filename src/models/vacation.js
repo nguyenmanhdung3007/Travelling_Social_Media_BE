@@ -11,7 +11,7 @@ const vacationModel = new mongoose.Schema(
     comments: [{ type: mongoose.Types.ObjectId, ref: "Comments" }],
     userTags: [{ type: mongoose.Types.ObjectId, ref: "Users" }],
     // posts: [{ type: mongoose.Types.ObjectId, ref: "Posts" }],
-    milestones: [{ type: mongoose.Types.ObjectId, ref: "Milestones" }],
+    mileStones: [{ type: mongoose.Types.ObjectId, ref: "Milestones" }],
     privacy: {
       type: String,
       enum: ["onlyMe", "allowedUsers", "public"],

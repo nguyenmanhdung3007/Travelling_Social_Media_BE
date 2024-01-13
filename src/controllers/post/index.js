@@ -29,7 +29,7 @@ const createPost = async (req, res) => {
       images: data,
     });
 
-    return res.status(400).json({
+    return res.status(200).json({
       sucess: true,
       message: "Đã tạo bài viết thành công",
       data: post,

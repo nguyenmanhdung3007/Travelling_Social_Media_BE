@@ -7,16 +7,15 @@ const PORT = process.env.PORT || 8000;
 
 const app = express();
 
+const indexRoute = require("./routes/index");
+const { connection } = require("mongoose");
 const connectionDB = require("./util/connectDB");
 connectionDB();
-app.use(cors({ origin: "*" }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-const indexRoute = require("./routes/index");
-const { connection } = require("mongoose");
 
-const cors = require("cors");
 app.use(cors({origin: "*" }));
 
 app.use("/", indexRoute);
