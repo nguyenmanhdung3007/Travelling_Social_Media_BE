@@ -21,7 +21,7 @@ const getPost = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res
-      .status(404)
+      .status(400)
       .json({ message: "Đã xảy ra lỗi trong quá trình load bài post" });
   }
 };
@@ -64,16 +64,34 @@ const createPost = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
   }
 };
 
 const likePost = async (req, res) => {
-  const userId = req.params.id;
-  const postId = req.body;
+  try {
+    const postId = req.params.id;
+    const {userId} = req.body;
 
-  const post = postModel.findById(postId);
-  const isLiked = post.likes;
+    const post =await postModel.findById(postId);
+
+    if (!post) {
+      return res.status(400).json({ message: "Bài post không tồn tại" });
+    }
+    if (post.likes?.includes(userId)) {
+      post.likes = post.likes.filter((pid) => pid !== userId);
+    } else {
+      post.likes?.push(userId);
+    }
+    await post.save();
+    return res.status(200).json({
+      sucess: true,
+      data: post,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ error: error.message });
+  }
 };
 
-module.exports = { createPost, getPost };
+module.exports = { createPost, getPost, likePost };

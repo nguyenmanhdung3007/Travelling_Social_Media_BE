@@ -35,7 +35,27 @@ const createComment = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
-const getComment = async (req, res) => {};
+const getComment = async (req, res) => {
+  try {
+    const commentId = req.params.id;
+
+    const comment = await commentModel
+      .findById(commentId)
+      .populate("post")
+      .populate({ path: "userId", select: "-password" })
+      .populate({ path: "comments", select: "-password" });
+
+    return res.status(200).json({
+      sucess: true,
+      data: post,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(400)
+      .json({ message: "Đã xảy ra lỗi trong quá trình load bài post" });
+  }
+};
 const getAllComment = async (req, res) => {};
 const updateComment = async (req, res) => {};
 const deleteComment = async (req, res) => {};

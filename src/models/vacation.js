@@ -14,10 +14,10 @@ const vacationModel = new mongoose.Schema(
     milestones: [{ type: mongoose.Types.ObjectId, ref: "Milestones" }],
     privacy: {
       type: String,
-      enum: ["onlyMe", "allowedUsers", "public"],
+      enum: ["onlyMe", "onlyUserChoose", "public"],
       default: "public",
     },
-    allowedUsers: [{ type: mongoose.Types.ObjectId, ref: "Users" }],
+    userChoose: [{ type: mongoose.Types.ObjectId, ref: "Users" }],
     status: {
       type: String,
       enum: ["Intention", "In Progress", "Finished"],
