@@ -17,7 +17,7 @@ const vacationModel = new mongoose.Schema(
       enum: ["onlyMe", "onlyUserChoose", "public"],
       default: "public",
     },
-    userChoose: [{ type: String }],
+    userChoose: [{ type: mongoose.Types.ObjectId, ref: "Users" }],
     status: {
       type: String,
       enum: ["Intention", "In Progress", "Finished"],
