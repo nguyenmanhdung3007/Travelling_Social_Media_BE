@@ -48,7 +48,7 @@ const createVacation = async (req, res) => {
       startedAt,
       endedAt,
       privacy,
-      // allowedUsers,
+      userChoose,
       // status,
       participants,
       milestones,
@@ -73,17 +73,41 @@ const createVacation = async (req, res) => {
         .json({ message: "Ngày kết thúc không thể trước ngày bắt đầu." });
     }
 
-
-    const vacation = await vacationModel.create({
-      createdBy: userId,
-      desc,
-      title,
-      startedAt,
-      endedAt,
-      participants,
-      // privacy,
-      // status,
-    });
+    if (privacy === "onlyUserChoose") {
+      vacation = await vacationModel.create({
+        createdBy: userId,
+        desc,
+        title,
+        startedAt,
+        endedAt,
+        privacy,
+        userChoose,
+        participants,
+        // status,
+      });
+    } else if (privacy === "onlyMe") {
+      vacation = await vacationModel.create({
+        createdBy: userId,
+        desc,
+        title,
+        startedAt,
+        endedAt,
+        participants,
+        privacy,
+        // status,
+      });
+    } else if (privacy === "public") {
+      vacation = await vacationModel.create({
+        createdBy: userId,
+        desc,
+        title,
+        startedAt,
+        endedAt,
+        participants,
+        // privacy,
+        // status,
+      });
+    }
 
     if (milestones?.length != 0) {
       for (let i = 0; i < milestones?.length; i++) {
@@ -133,11 +157,9 @@ const updateVacation = async (req, res) => {
 
     // Kiểm tra xem người đăng nhập có quyền cập nhật kỳ nghỉ không
     if (req.user._id.toString() !== existingVacation.createdBy.toString()) {
-      return res
-        .status(403)
-        .json({
-          message: "Bạn không có quyền cập nhật kỳ nghỉ",
-        });
+      return res.status(403).json({
+        message: "Bạn không có quyền cập nhật kỳ nghỉ",
+      });
     }
 
     // Lấy thông tin cập nhật từ req.body
