@@ -26,9 +26,45 @@ const getVacation = async (req, res) => {
   }
 };
 
+const getVacationOnPageUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const vacations = await Vacation.find({
+      $or: [{ createdBy: userId }, { participants: userId }],
+    })
+      .populate("comments")
+      .populate("milestones")
+      .populate({ path: "allowedUsers", select: "-password" })
+      .populate({ path: "participants", select: "-password" });
+
+    if (vacations.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No vacations found for the user." });
+    }
+
+    res.status(200).json({ success: true, data: vacations });
+  } catch (error) {
+    console.log(error.message);
+    return res
+      .status(404)
+      .json({ message: "Đã xảy ra lỗi trong quá trình load kỳ nghỉ" });
+  }
+};
+
 const getAllVacations = async (req, res) => {
   try {
-    const vacations = await vacationModel.find({}).populate;
+    const pageIndex = req.query.pageIndex || 1;
+    const pageSize = req.query.pageSize || 5;
+
+    const vacations = await vacationModel
+      .find()
+      .populate("comments")
+      .populate("milestones")
+      .populate({ path: "userChoose", select: "-password" })
+      .populate({ path: "participants", select: "-password" })
+      .skip(pageSize * pageIndex - pageSize)
+      .limit(pageSize);
 
     return res.status(200).json({ sucess: true, data: vacations });
   } catch (error) {
