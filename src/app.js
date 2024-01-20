@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 
-app.use(cors({origin: "*" }));
+app.use(cors({ origin: "*" }));
 
 app.use("/", indexRoute);
 
@@ -41,5 +41,6 @@ app.use(function (err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
+  res.render("error");
   res.json({ error: err.message });
 });
