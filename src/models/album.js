@@ -13,10 +13,10 @@ const albumModel = new mongoose.Schema(
     posts: [{ type: mongoose.Types.ObjectId, ref: "Posts" }],
     privacy: {
       type: String,
-      enum: ["onlyMe", "allowedUsers", "public"],
+      enum: ["onlyMe", "onlyUserChoose", "public"],
       default: "public",
     },
-    allowedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Users" }],
+    userChoose: [{ type: mongoose.Types.ObjectId, ref: "Users" }],
   },
   { timestamps: true }
 );

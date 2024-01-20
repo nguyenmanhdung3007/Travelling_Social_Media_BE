@@ -3,6 +3,11 @@ const mongoose = require("mongoose");
 const postModel = new mongoose.Schema(
   {
     postBy: { type: mongoose.Types.ObjectId, ref: "Users", required: true },
+    vacation: {
+      type: mongoose.Types.ObjectId,
+      ref: "Vacations",
+      required: true,
+    },
     milestone: {
       type: mongoose.Types.ObjectId,
       ref: "Milestones",

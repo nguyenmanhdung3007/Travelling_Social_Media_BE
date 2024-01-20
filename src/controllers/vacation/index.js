@@ -56,9 +56,11 @@ const getAllVacations = async (req, res) => {
   try {
     const pageIndex = req.query.pageIndex || 1;
     const pageSize = req.query.pageSize || 5;
+    const userId = req.body
 
     const vacations = await vacationModel
-      .find()
+      .find({$or: [{ createdBy: userId }, { participants: userId }],})
+      .populate({ path: "createdBy", select: "-password" })
       .populate("comments")
       .populate("milestones")
       .populate({ path: "userChoose", select: "-password" })
@@ -70,7 +72,7 @@ const getAllVacations = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res
-      .status(500)
+      .status(404)
       .json({ message: "Đã xảy ra lỗi trong quá trình load kỳ nghỉ" });
   }
 };
@@ -119,7 +121,6 @@ const createVacation = async (req, res) => {
         privacy,
         userChoose,
         participants,
-        // status,
       });
     } else if (privacy === "onlyMe") {
       vacation = await vacationModel.create({
@@ -130,7 +131,6 @@ const createVacation = async (req, res) => {
         endedAt,
         participants,
         privacy,
-        // status,
       });
     } else if (privacy === "public") {
       vacation = await vacationModel.create({
@@ -140,8 +140,7 @@ const createVacation = async (req, res) => {
         startedAt,
         endedAt,
         participants,
-        // privacy,
-        // status,
+        privacy,
       });
     }
 

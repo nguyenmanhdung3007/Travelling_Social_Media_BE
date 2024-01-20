@@ -22,7 +22,7 @@ const getUser = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res.status(400).json({ message: error.message });
+    return res.status(404).json({ message: error.message });
   }
 };
 
@@ -57,7 +57,7 @@ const updateUser = async (req, res) => {
       user: user,
     });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(404).json({ message: error.message });
   }
 };
 
@@ -72,7 +72,7 @@ const deleteUser = async (req, res) => {
       user: user,
     });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(404).json({ message: error.message });
   }
 };
 

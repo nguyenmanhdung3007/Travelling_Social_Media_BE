@@ -29,8 +29,21 @@ const getPost = async (req, res) => {
 const createPost = async (req, res) => {
   try {
     const userId = req.params.id;
-    const { milestone, content, likes, comments } = req.body;
+    const {vacation, milestone, content, likes, comments } = req.body;
     const images = req.file;
+
+    
+
+    if(!milestone){
+      return res.status(400).json({ error: "Hãy thêm vacation" });
+    }
+
+    
+    if(!milestone){
+      return res.status(400).json({ error: "Hãy thêm milestone" });
+    }
+
+    
 
     console.log(images);
     const data = await uploadImage(images);
