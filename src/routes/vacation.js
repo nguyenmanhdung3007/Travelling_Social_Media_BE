@@ -4,6 +4,7 @@ const {
   updateVacation,
   getAllVacations,
   getVacation,
+  getVacationOnPageUser,
 } = require("../controllers/vacation");
 const upload = require("../util/multer");
 
@@ -13,6 +14,9 @@ const router = require("express").Router();
 router.post('/create/:id', createVacation)
 router.get("/get-all-vacations/", getAllVacations);
 router.get("/detail/:id", getVacation);
+router.get("/:id", getVacationOnPageUser);
+
+
 
 router.patch("/:id", updateVacation);
 
