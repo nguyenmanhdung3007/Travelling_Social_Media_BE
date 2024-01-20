@@ -1,4 +1,3 @@
-const { log } = require("console");
 const { uploadImage } = require("../../cloudinary");
 const postModel = require("../../models/post");
 const { postSchema } = require("../post/validation");
@@ -32,18 +31,9 @@ const createPost = async (req, res) => {
     const {vacation, milestone, content, likes, comments } = req.body;
     const images = req.file;
 
-    
-
-    if(!milestone){
-      return res.status(400).json({ error: "Hãy thêm vacation" });
-    }
-
-    
     if(!milestone){
       return res.status(400).json({ error: "Hãy thêm milestone" });
     }
-
-    
 
     console.log(images);
     const data = await uploadImage(images);

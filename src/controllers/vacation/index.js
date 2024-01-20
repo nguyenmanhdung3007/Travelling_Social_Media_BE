@@ -11,7 +11,8 @@ const getVacation = async (req, res) => {
       .findById(vacationId)
       .populate("comments")
       .populate("milestones")
-      .populate({ path: "allowedUsers", select: "-password" })
+      .populate({ path: "createdBy", select: "-password" })
+      .populate({ path: "userChoose", select: "-password" })
       .populate({ path: "participants", select: "-password" });
 
     return res.status(200).json({
@@ -29,12 +30,13 @@ const getVacation = async (req, res) => {
 const getVacationOnPageUser = async (req, res) => {
   try {
     const userId = req.params.id;
-    const vacations = await Vacation.find({
-      $or: [{ createdBy: userId }, { participants: userId }],
+
+    const vacations = await vacationModel.find({
+      $or: [{ createdBy: userId }, { participants: userId }, { userChoose: userId }],
     })
       .populate("comments")
       .populate("milestones")
-      .populate({ path: "allowedUsers", select: "-password" })
+      .populate({ path: "userChoose", select: "-password" })
       .populate({ path: "participants", select: "-password" });
 
     if (vacations.length === 0) {
@@ -56,10 +58,10 @@ const getAllVacations = async (req, res) => {
   try {
     const pageIndex = req.query.pageIndex || 1;
     const pageSize = req.query.pageSize || 5;
-    const userId = req.body
+    const { userId } = req.body;
 
     const vacations = await vacationModel
-      .find({$or: [{ createdBy: userId }, { participants: userId }],})
+      .find({ $or: [{ participants: userId }, { privacy: "public" }, { userChoose: userId }] })
       .populate({ path: "createdBy", select: "-password" })
       .populate("comments")
       .populate("milestones")
@@ -254,6 +256,7 @@ const deleteVacation = async (req, res) => {
     const vacationId = req.params._id;
 
     const deletedVacation = await vacationModel.findByIdAndDelete(vacationId);
+    
 
     return res
       .status(200)
@@ -264,10 +267,13 @@ const deleteVacation = async (req, res) => {
   }
 };
 
+
+
 module.exports = {
   getVacation,
   getAllVacations,
   createVacation,
   updateVacation,
   deleteVacation,
+  getVacationOnPageUser,
 };
