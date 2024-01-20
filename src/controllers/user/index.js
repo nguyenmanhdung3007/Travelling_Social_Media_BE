@@ -2,7 +2,7 @@ const { User } = require("../../models/user");
 
 const getAllUser = async (req, res) => {
   try {
-    const users = await User.find({});
+    const users = await User.find({}).select("-password");
     return res.status(200).json({
       user: users,
     });
@@ -15,14 +15,14 @@ const getUser = async (req, res) => {
   try {
     const userId = req.params.id;
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).select("-password");
     return res.status(200).json({
       sucess: true,
       user: user,
     });
   } catch (error) {
     console.log(error);
-    return res.status(400).json({ message: error.message });
+    return res.status(404).json({ message: error.message });
   }
 };
 
@@ -57,7 +57,7 @@ const updateUser = async (req, res) => {
       user: user,
     });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(404).json({ message: error.message });
   }
 };
 
@@ -72,7 +72,7 @@ const deleteUser = async (req, res) => {
       user: user,
     });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(404).json({ message: error.message });
   }
 };
 

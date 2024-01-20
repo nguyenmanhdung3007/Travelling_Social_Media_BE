@@ -7,14 +7,14 @@ const PORT = process.env.PORT || 8000;
 
 const app = express();
 
+const indexRoute = require("./routes/index");
+const { connection } = require("mongoose");
 const connectionDB = require("./util/connectDB");
 connectionDB();
-app.use(cors({ origin: "*" }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-const indexRoute = require("./routes/index");
-const { connection } = require("mongoose");
 
 app.use(cors({ origin: "*" }));
 
@@ -42,4 +42,5 @@ app.use(function (err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render("error");
+  res.json({ error: err.message });
 });

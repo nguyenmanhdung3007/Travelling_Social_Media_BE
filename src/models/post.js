@@ -3,11 +3,11 @@ const mongoose = require("mongoose");
 const postModel = new mongoose.Schema(
   {
     postBy: { type: mongoose.Types.ObjectId, ref: "Users", required: true },
-    // vacation: {
-    //   type: mongoose.Types.ObjectId,
-    //   ref: "Vacations",
-    //   required: true,
-    // },
+    vacation: {
+      type: mongoose.Types.ObjectId,
+      ref: "Vacations",
+      required: true,
+    },
     milestone: {
       type: mongoose.Types.ObjectId,
       ref: "Milestones",
@@ -15,15 +15,8 @@ const postModel = new mongoose.Schema(
     },
     content: { type: String },
     images: { type: String },
-    // milestones: { type: Date },
-    likes: [{type: mongoose.Types.ObjectId, ref: "Users"}],
+    likes: [{type: String}],
     comments: [{type: mongoose.Types.ObjectId, ref: "Comments"}],
-    // privacy: {
-    //   type: String,
-    //   enum: ["onlyMe", "allowedUsers", "public"],
-    //   default: "public",
-    // },
-    // allowedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Users" }],
   },
   { timestamps: true }
 );

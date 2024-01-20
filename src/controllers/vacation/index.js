@@ -1,19 +1,19 @@
-const { log } = require("console");
 const vacationModel = require("../../models/vacation");
-const mileStoneModel = require("../../models/milestone");
+const milestoneModel = require("../../models/milestone");
 const { vacationSchema } = require("../vacation/validation");
-const { createMileStone } = require("../milestone");
+const { createMilestone } = require("../milestone");
 
 const getVacation = async (req, res) => {
   try {
-    const vacationId = req.params._id;
+    const vacationId = req.params.id;
 
     const vacation = await vacationModel
-      .find(vacationId)
-      .populate({ path: "likes", select: "-password" })
+      .findById(vacationId)
+      .populate("comments")
       .populate("milestones")
-      .populate({ path: "allowedUsers", select: "-password" })
-      .populate({ path: "paticipants", select: "-password" });
+      .populate({ path: "createdBy", select: "-password" })
+      .populate({ path: "userChoose", select: "-password" })
+      .populate({ path: "participants", select: "-password" });
 
     return res.status(200).json({
       sucess: true,
@@ -27,30 +27,83 @@ const getVacation = async (req, res) => {
   }
 };
 
+const getVacationOnPageUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    const vacations = await vacationModel
+      .find({
+        $or: [
+          { createdBy: userId },
+          { participants: userId },
+          { userChoose: userId },
+        ],
+      })
+      .populate("comments")
+      .populate("milestones")
+      .populate({ path: "userChoose", select: "-password" })
+      .populate({ path: "participants", select: "-password" });
+
+    if (vacations.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No vacations found for the user." });
+    }
+
+    res.status(200).json({ success: true, data: vacations });
+  } catch (error) {
+    console.log(error.message);
+    return res
+      .status(404)
+      .json({ message: "Đã xảy ra lỗi trong quá trình load kỳ nghỉ" });
+  }
+};
+
 const getAllVacations = async (req, res) => {
   try {
-    const vacations = await vacationModel.find({}).populate;
+    const pageIndex = req.query.pageIndex || 1;
+    const pageSize = req.query.pageSize || 5;
+    const { userId } = req.body;
+
+    const vacations = await vacationModel
+      .find({
+        $or: [
+          { participants: userId },
+          { privacy: "public" },
+          { userChoose: userId },
+        ],
+      })
+      .sort({
+        updatedAt: -1,
+      })
+      .populate({ path: "createdBy", select: "-password" })
+      .populate("comments")
+      .populate("milestones")
+      .populate({ path: "userChoose", select: "-password" })
+      .populate({ path: "participants", select: "-password" })
+      .skip(pageSize * pageIndex - pageSize)
+      .limit(pageSize);
 
     return res.status(200).json({ sucess: true, data: vacations });
   } catch (error) {
     console.log(error);
     return res
-      .status(500)
+      .status(404)
       .json({ message: "Đã xảy ra lỗi trong quá trình load kỳ nghỉ" });
   }
 };
 
 const createVacation = async (req, res) => {
   try {
-    // const userId = req.params.id;
+    const userId = req.params.id;
     const {
       title,
       desc,
       startedAt,
       endedAt,
       privacy,
-      allowedUsers,
-      status,
+      userChoose,
+      // status,
       participants,
       milestones,
     } = req.body;
@@ -60,8 +113,8 @@ const createVacation = async (req, res) => {
       desc,
       startedAt,
       endedAt,
-      privacy,
-      status,
+      // privacy,
+      // status,
     });
 
     if (validate.error) {
@@ -74,15 +127,38 @@ const createVacation = async (req, res) => {
         .json({ message: "Ngày kết thúc không thể trước ngày bắt đầu." });
     }
 
-    const vacation = await vacationModel.create({
-      createdBy: userId,
-      title,
-      startedAt,
-      endedAt,
-      privacy,
-      status,
-      participants,
-    });
+    if (privacy === "onlyUserChoose") {
+      vacation = await vacationModel.create({
+        createdBy: userId,
+        desc,
+        title,
+        startedAt,
+        endedAt,
+        privacy,
+        userChoose,
+        participants,
+      });
+    } else if (privacy === "onlyMe") {
+      vacation = await vacationModel.create({
+        createdBy: userId,
+        desc,
+        title,
+        startedAt,
+        endedAt,
+        participants,
+        privacy,
+      });
+    } else if (privacy === "public") {
+      vacation = await vacationModel.create({
+        createdBy: userId,
+        desc,
+        title,
+        startedAt,
+        endedAt,
+        participants,
+        privacy,
+      });
+    }
 
     if (milestones?.length != 0) {
       for (let i = 0; i < milestones?.length; i++) {
@@ -96,12 +172,12 @@ const createVacation = async (req, res) => {
             .status(400)
             .json({ message: "Thời gian nằm ngoài kỳ nghỉ. Hãy nhập lại" });
         }
-        const mileStone = await mileStoneModel.create({
+        const milestone = await milestoneModel.create({
           time,
           desc,
           vacation: vacationId,
         });
-        vacation.milestones.push(mileStone);
+        vacation.milestones.push(milestone);
         await vacation.save();
       }
     }
@@ -131,13 +207,11 @@ const updateVacation = async (req, res) => {
     }
 
     // Kiểm tra xem người đăng nhập có quyền cập nhật kỳ nghỉ không
-    if (req.user._id.toString() !== existingVacation.createdBy.toString()) {
-      return res
-        .status(403)
-        .json({
-          message: "Bạn không có quyền cập nhật kỳ nghỉ",
-        });
-    }
+    // if (req.user._id.toString() !== existingVacation.createdBy.toString()) {
+    //   return res.status(403).json({
+    //     message: "Bạn không có quyền cập nhật kỳ nghỉ",
+    //   });
+    // }
 
     // Lấy thông tin cập nhật từ req.body
     const {
@@ -146,7 +220,7 @@ const updateVacation = async (req, res) => {
       startedAt,
       endedAt,
       privacy,
-      allowedUsers,
+      userChoose,
       status,
       participants,
     } = req.body;
@@ -156,8 +230,6 @@ const updateVacation = async (req, res) => {
       desc,
       startedAt,
       endedAt,
-      privacy,
-      status,
     });
 
     if (validate.error) {
@@ -170,8 +242,8 @@ const updateVacation = async (req, res) => {
     existingVacation.startedAt = startedAt || existingVacation.startedAt;
     existingVacation.endedAt = endedAt || existingVacation.endedAt;
     existingVacation.privacy = privacy || existingVacation.privacy;
-    existingVacation.allowedUsers =
-      allowedUsers || existingVacation.allowedUsers;
+    existingVacation.userChoose =
+      userChoose || existingVacation.userChoose;
     existingVacation.status = status || existingVacation.status;
     existingVacation.participants =
       participants || existingVacation.participants;
@@ -207,8 +279,10 @@ const deleteVacation = async (req, res) => {
 };
 
 module.exports = {
+  getVacation,
   getAllVacations,
   createVacation,
   updateVacation,
   deleteVacation,
+  getVacationOnPageUser,
 };

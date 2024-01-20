@@ -7,23 +7,23 @@ const vacationModel = new mongoose.Schema(
     desc: { type: String },
     startedAt: { type: Date },
     endedAt: { type: Date },
-    likes: [{ type: mongoose.Types.ObjectId, ref: "Users" }],
+    likes: [{type: String}],
     comments: [{ type: mongoose.Types.ObjectId, ref: "Comments" }],
-    userTags: [{ type: mongoose.Types.ObjectId, ref: "Users" }],
+    // userTags: [{ type: mongoose.Types.ObjectId, ref: "Users" }],
     // posts: [{ type: mongoose.Types.ObjectId, ref: "Posts" }],
     milestones: [{ type: mongoose.Types.ObjectId, ref: "Milestones" }],
     privacy: {
       type: String,
-      enum: ["onlyMe", "allowedUsers", "public"],
+      enum: ["onlyMe", "onlyUserChoose", "public"],
       default: "public",
     },
-    allowedUsers: [{ type: mongoose.Types.ObjectId, ref: "Users" }],
+    userChoose: [{ type: mongoose.Types.ObjectId, ref: "Users" }],
     status: {
       type: String,
       enum: ["Intention", "In Progress", "Finished"],
       default: "In Progress",
     },
-    paticipants:[{type: mongoose.Types.ObjectId, ref: "Users"}]
+    participants:[{type: mongoose.Types.ObjectId, ref: "Users"}]
   },
   { timestamps: true }
 );
