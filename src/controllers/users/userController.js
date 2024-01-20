@@ -32,6 +32,19 @@ exports.register = async (req, res) => {
     });
   }
 
+  let userNameExists;
+  try {
+    userNameExists = await User.findOne({ userName });
+  } catch (err) {
+    console.errors(err.message);
+    res.status(500).send({ msg: "Server Error" });
+  }
+  if (userNameExists) {
+    return res.status(200).json({
+      status: "fail",
+      msg: "Username already exists, please choose another.",
+    });
+  }
   let hashedPassword;
   try {
     hashedPassword = await bcrypt.hash(password, 12); // ma hoa mat khau
@@ -58,61 +71,63 @@ exports.register = async (req, res) => {
 
 // login - dang nhap
 exports.login = async (req, res, next) => {
-  if (!req.headers.authorization) {
-    const { email, password } = req.body;
+  try {
+    if (!req.headers.authorization) {
+      const { email, password } = req.body;
 
-    let staff;
-    try {
-      staff = await User.findOne({ email: email });
-    } catch (error) {
-      console.log(error);
-    }
-    if (!staff) {
-      return res.json({ status: "fail", msg: "email not found" });
-    }
+      const staff = await User.findOne({ email: email });
 
-    let check = false;
-    try {
-      check = await bcrypt.compare(password, staff.password);
-    } catch (err) {
-      console.log(err);
-    }
-    if (!check) {
-      return res.json({ status: "fail", msg: "Password is not match!" });
-    }
+      if (!staff) {
+        return res.json({ status: "fail", msg: "Email not found" });
+      }
 
-    const token = createJwtToken(staff._id);
-    return res.json({
-      status: "success",
-      msg: "login successfully",
-      token: token,
-      data: staff,
-    });
-  } else {
-    const token = req.headers.authorization.split(" ")[1];
-    if (token) {
-      jwt.verify(
-        token,
-        process.env.JWT_SECRET_KEY,
-        function (err, decodedToken) {
-          if (err) {
-            return res.json({ status: "fail", msg: "Invalid token" });
-          }
-          User.findOne({ _id: decodedToken.userID }, (err, doc) => {
+      const passwordMatch = await bcrypt.compare(password, staff.password);
+      if (!passwordMatch) {
+        return res.json({ status: "fail", msg: "Password does not match!" });
+      }
+
+      const token = createJwtToken(staff._id);
+      return res.json({
+        status: "success",
+        msg: "Login successful",
+        token: token,
+        data: staff,
+      });
+    } else {
+      const token = req.headers.authorization.split(" ")[1];
+
+      if (token) {
+        jwt.verify(
+          token,
+          process.env.JWT_SECRET_KEY,
+          async (err, decodedToken) => {
             if (err) {
-              return res.json({ status: "fail", msg: "server error" });
-            } else if (doc) {
+              return res.json({ status: "fail", msg: "Invalid token" });
+            }
+
+            try {
+              const doc = await User.findOne({ _id: decodedToken.userID });
+
+              if (!doc) {
+                return res.json({ status: "fail", msg: "User not found" });
+              }
+
               return res.json({
                 status: "success",
-                msg: "login successfully!",
+                msg: "Login successful!",
                 token: token,
                 data: doc,
               });
+            } catch (err) {
+              return res.json({ status: "fail", msg: "Server error" });
             }
-          });
-        }
-      );
+          }
+        );
+      }
     }
+  } catch (error) {
+    console.error(error);
+    return res.json({ status: "fail", msg: "Internal server error" });
   }
 };
 
