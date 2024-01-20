@@ -31,9 +31,14 @@ const getVacationOnPageUser = async (req, res) => {
   try {
     const userId = req.params.id;
 
-    const vacations = await vacationModel.find({
-      $or: [{ createdBy: userId }, { participants: userId }, { userChoose: userId }],
-    })
+    const vacations = await vacationModel
+      .find({
+        $or: [
+          { createdBy: userId },
+          { participants: userId },
+          { userChoose: userId },
+        ],
+      })
       .populate("comments")
       .populate("milestones")
       .populate({ path: "userChoose", select: "-password" })
@@ -61,7 +66,16 @@ const getAllVacations = async (req, res) => {
     const { userId } = req.body;
 
     const vacations = await vacationModel
-      .find({ $or: [{ participants: userId }, { privacy: "public" }, { userChoose: userId }] })
+      .find({
+        $or: [
+          { participants: userId },
+          { privacy: "public" },
+          { userChoose: userId },
+        ],
+      })
+      .sort({
+        updatedAt: -1,
+      })
       .populate({ path: "createdBy", select: "-password" })
       .populate("comments")
       .populate("milestones")
@@ -193,11 +207,11 @@ const updateVacation = async (req, res) => {
     }
 
     // Kiểm tra xem người đăng nhập có quyền cập nhật kỳ nghỉ không
-    if (req.user._id.toString() !== existingVacation.createdBy.toString()) {
-      return res.status(403).json({
-        message: "Bạn không có quyền cập nhật kỳ nghỉ",
-      });
-    }
+    // if (req.user._id.toString() !== existingVacation.createdBy.toString()) {
+    //   return res.status(403).json({
+    //     message: "Bạn không có quyền cập nhật kỳ nghỉ",
+    //   });
+    // }
 
     // Lấy thông tin cập nhật từ req.body
     const {
@@ -206,7 +220,7 @@ const updateVacation = async (req, res) => {
       startedAt,
       endedAt,
       privacy,
-      allowedUsers,
+      userChoose,
       status,
       participants,
     } = req.body;
@@ -216,8 +230,6 @@ const updateVacation = async (req, res) => {
       desc,
       startedAt,
       endedAt,
-      privacy,
-      status,
     });
 
     if (validate.error) {
@@ -230,8 +242,8 @@ const updateVacation = async (req, res) => {
     existingVacation.startedAt = startedAt || existingVacation.startedAt;
     existingVacation.endedAt = endedAt || existingVacation.endedAt;
     existingVacation.privacy = privacy || existingVacation.privacy;
-    existingVacation.allowedUsers =
-      allowedUsers || existingVacation.allowedUsers;
+    existingVacation.userChoose =
+      userChoose || existingVacation.userChoose;
     existingVacation.status = status || existingVacation.status;
     existingVacation.participants =
       participants || existingVacation.participants;
@@ -256,7 +268,6 @@ const deleteVacation = async (req, res) => {
     const vacationId = req.params._id;
 
     const deletedVacation = await vacationModel.findByIdAndDelete(vacationId);
-    
 
     return res
       .status(200)
@@ -266,8 +277,6 @@ const deleteVacation = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
-
-
 
 module.exports = {
   getVacation,
