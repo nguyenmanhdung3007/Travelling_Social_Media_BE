@@ -23,7 +23,8 @@ const vacationModel = new mongoose.Schema(
       enum: ["Intention", "In Progress", "Finished"],
       default: "In Progress",
     },
-    participants:[{type: mongoose.Types.ObjectId, ref: "Users"}]
+    participants:[{type: mongoose.Types.ObjectId, ref: "Users"}],
+    views:{type: Number}
   },
   { timestamps: true }
 );

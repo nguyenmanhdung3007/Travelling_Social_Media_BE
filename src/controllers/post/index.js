@@ -28,27 +28,33 @@ const getPost = async (req, res) => {
 const createPost = async (req, res) => {
   try {
     const userId = req.params.id;
-    const {vacation, milestone, content, likes, comments } = req.body;
+    const { vacationId, milestoneId, content, likes, comments } = req.body;
     const images = req.file;
 
-    if(!milestone){
-      return res.status(400).json({ error: "Hãy thêm milestone" });
-    }
-
     console.log(images);
-    const data = await uploadImage(images);
-    console.log(data);
-
     const validate = postSchema.validate({
+      vacationId,
+      milestoneId,
       content,
     });
     if (validate.error) {
       return res.status(400).json({ error: validate.error.message });
     }
 
+    const milestone = milestoneModel.findById(milestoneId);
+
+    if (!milestone) {
+      return res.status(400).json({ error: "Milestone không tồn tại" });
+    }
+
+    console.log(images);
+    const data = await uploadImage(images);
+    console.log(data);
+
     const post = await postModel.create({
       postBy: userId,
-      milestone,
+      vacation: vacationId,
+      milestone: milestoneId,
       content,
       likes,
       comments,
@@ -74,9 +80,9 @@ const createPost = async (req, res) => {
 const likePost = async (req, res) => {
   try {
     const postId = req.params.id;
-    const {userId} = req.body;
+    const { userId } = req.body;
 
-    const post =await postModel.findById(postId);
+    const post = await postModel.findById(postId);
 
     if (!post) {
       return res.status(400).json({ message: "Bài post không tồn tại" });
