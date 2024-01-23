@@ -1,4 +1,5 @@
 const { User } = require("../../models/user");
+const { userSchema } = require("./validation");
 
 const getAllUser = async (req, res) => {
   try {
@@ -30,6 +31,16 @@ const updateUser = async (req, res) => {
   try {
     const userId = req.params.id;
     const { fullName, userName, dateOfBirth, gender, bio } = req.body;
+
+    const validate = userSchema.validate({
+      fullName,
+      bio,
+      dateOfBirth,
+      gender,
+    });
+    if (validate.error) {
+      return res.status(400).json({ error: validate.error.message });
+    }
 
     const avatar = req.body.avatar;
     const currentDate = new Date();

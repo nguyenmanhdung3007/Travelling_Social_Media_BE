@@ -17,7 +17,7 @@ router.post("/changepass/:id", userController.userChangePass);
 router.get("/get_all_user", getAllUser);
 router.get("/get_user/:id", getUser);
 
-router.patch("/profile/update/:id", upload.single("avatar"), updateUser);
+router.put("/profile/update/:id", upload.single("avatar"), updateUser);
 
 // thong tin nguoi dung
 router.post("/userinfo", async (req, res) => {
