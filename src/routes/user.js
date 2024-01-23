@@ -1,7 +1,8 @@
 const router = require("express").Router();
 const { getAllUser, updateUser, getUser } = require("../controllers/user");
 const userController = require("../controllers/users/userController");
-const {User} = require("../models/user");
+const { User } = require("../models/user");
+const upload = require("../util/multer");
 router.get("/", (req, res) => {
   res.status(200).json({ message: "OK" });
 });
@@ -13,21 +14,30 @@ router.post("/forgetpass", userController.forgetPass);
 router.post("/changepass/:id", userController.userChangePass);
 // --- end user ----
 
+router.get("/get_all_user", getAllUser);
+router.get("/get_user/:id", getUser);
 
-router.get("/get_all_user", getAllUser)
-router.get("/get_user/:id", getUser)
-
-
-router.patch("/profile/update/:id", updateUser)
+router.patch("/profile/update/:id", upload.single("avatar"), updateUser);
 
 // thong tin nguoi dung
 router.post("/userinfo", async (req, res) => {
   try {
-    const { fullName, email, userName, password, avatar, dateOfBirth, gender, userInfo } = req.body;
+    const {
+      fullName,
+      email,
+      userName,
+      password,
+      avatar,
+      dateOfBirth,
+      gender,
+      userInfo,
+    } = req.body;
 
     // Kiểm tra xem các trường bắt buộc có đầy đủ không
     if (!fullName || !password) {
-      return res.status(400).json({ message: "Vui lòng điền đầy đủ thông tin bắt buộc." });
+      return res
+        .status(400)
+        .json({ message: "Vui lòng điền đầy đủ thông tin bắt buộc." });
     }
 
     // Tạo một đối tượng người dùng mới
@@ -51,6 +61,5 @@ router.post("/userinfo", async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
-
 
 module.exports = router;
