@@ -54,7 +54,6 @@ const uploadImage = async (file) => {
         (err, result) => reject(err)
       )
       .end(file?.buffer, (result) => {
-        console.log(result);
         resolve(newFileName);
       });
   });
@@ -62,32 +61,55 @@ const uploadImage = async (file) => {
   return data;
 };
 
+// const uploadVideo = async (file) => {
+//   const newFileName = `${new Date().getTime()}-${file.name}`;
+//   return new Promise((resolve, reject) => {
+//     cloudinary.uploader
+//       .upload_stream(
+//         {
+//           resource_type: "video",
+//           filename_override: `${newFileName}`,
+//           use_filename: true,
+//           unique_filename: false,
+//           eager: [
+//             { width: 300, height: 300, crop: "pad", audio_codec: "none" },
+//             {
+//               width: 160,
+//               height: 100,
+//               crop: "crop",
+//               gravity: "south",
+//               audio_codec: "none",
+//             },
+//           ],
+//           eager_async: true,
+//         },
+//         (err) => reject(err)
+//       )
+//       .end(file?.data, () => resolve(newFileName));
+//   });
+// };
+
 const uploadVideo = async (file) => {
-  const newFileName = `${new Date().getTime()}-${file.name}`;
-  return new Promise((resolve, reject) => {
+  const newFileName = `${new Date().getTime()}-${file.originalname}`;
+
+  const data = await new Promise((resolve, reject) => {
     cloudinary.uploader
       .upload_stream(
         {
-          resource_type: "video",
+          resource_type: "video", // Thay đổi từ "image" thành "video"
           filename_override: `${newFileName}`,
           use_filename: true,
           unique_filename: false,
-          eager: [
-            { width: 300, height: 300, crop: "pad", audio_codec: "none" },
-            {
-              width: 160,
-              height: 100,
-              crop: "crop",
-              gravity: "south",
-              audio_codec: "none",
-            },
-          ],
-          eager_async: true,
         },
-        (err) => reject(err)
+        (err, result) => reject(err)
       )
-      .end(file?.data, () => resolve(newFileName));
+      .end(file?.buffer, (result) => {
+        resolve(newFileName);
+      });
   });
+
+  return data;
 };
+
 
 module.exports = { uploadImage, uploadVideo };
