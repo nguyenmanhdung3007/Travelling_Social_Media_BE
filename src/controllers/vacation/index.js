@@ -48,7 +48,7 @@ const getVacationOnPageUser = async (req, res) => {
     if (vacations.length === 0) {
       return res
         .status(404)
-        .json({ message: "No vacations found for the user." });
+        .json({ message: "Không có vacation nào cả" });
     }
 
     res.status(200).json({ success: true, data: vacations });
