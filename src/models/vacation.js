@@ -7,7 +7,7 @@ const vacationModel = new mongoose.Schema(
     desc: { type: String },
     startedAt: { type: Date },
     endedAt: { type: Date },
-    likes: [{type: String}],
+    likes: { uId: [{ type: String }], total: { type: Number, default: 0 } },
     comments: [{ type: mongoose.Types.ObjectId, ref: "Comments" }],
     // userTags: [{ type: mongoose.Types.ObjectId, ref: "Users" }],
     // posts: [{ type: mongoose.Types.ObjectId, ref: "Posts" }],
@@ -23,7 +23,8 @@ const vacationModel = new mongoose.Schema(
       enum: ["Intention", "In Progress", "Finished"],
       default: "In Progress",
     },
-    participants:[{type: mongoose.Types.ObjectId, ref: "Users"}]
+    participants: [{ type: mongoose.Types.ObjectId, ref: "Users" }],
+    views: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

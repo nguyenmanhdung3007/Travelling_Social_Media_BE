@@ -1,3 +1,4 @@
+const { date } = require("joi");
 const mongoose = require("mongoose");
 
 const postModel = new mongoose.Schema(
@@ -6,17 +7,17 @@ const postModel = new mongoose.Schema(
     vacation: {
       type: mongoose.Types.ObjectId,
       ref: "Vacations",
-      required: true,
+      // required: true,
     },
     milestone: {
       type: mongoose.Types.ObjectId,
       ref: "Milestones",
-      required: true,
+      // required: true,
     },
     content: { type: String },
     images: { type: String },
-    likes: [{type: String}],
-    comments: [{type: mongoose.Types.ObjectId, ref: "Comments"}],
+    likes: { uId: [{ type: String }], total: { type: Number, default: 0 } },
+    comments: [{ type: mongoose.Types.ObjectId, ref: "Comments" }],
   },
   { timestamps: true }
 );

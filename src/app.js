@@ -20,9 +20,9 @@ app.use(cors({ origin: "*" }));
 
 app.use("/", indexRoute);
 
-app.get("/", (req, res) => {
-  res.json({ message: "hello world" });
-});
+// app.get("/", (req, res) => {
+//   res.json({ message: "hello world" });
+// });
 
 app.listen(PORT, () => {
   console.log("server is running in port: ", +PORT);

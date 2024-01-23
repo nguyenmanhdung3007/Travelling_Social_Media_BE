@@ -1,7 +1,10 @@
-const { uploadImage } = require("../../cloudinary");
+const { uploadImage, uploadVideo } = require("../../cloudinary");
 const postModel = require("../../models/post");
+const vacationModel = require("../../models/vacation");
 const { postSchema } = require("../post/validation");
 const milestoneModel = require("../../models/milestone");
+const vacation = require("../../models/vacation");
+const { exist } = require("joi");
 
 const getPost = async (req, res) => {
   try {
@@ -28,27 +31,66 @@ const getPost = async (req, res) => {
 const createPost = async (req, res) => {
   try {
     const userId = req.params.id;
-    const {vacation, milestone, content, likes, comments } = req.body;
-    const images = req.file;
-
-    if(!milestone){
-      return res.status(400).json({ error: "Hãy thêm milestone" });
-    }
-
-    console.log(images);
-    const data = await uploadImage(images);
-    console.log(data);
+    const { vacation, milestone, content, likes, comments } = req.body;
+    const file = req.file;
+    console.log(file)
 
     const validate = postSchema.validate({
+      vacation,
+      milestone,
       content,
     });
     if (validate.error) {
       return res.status(400).json({ error: validate.error.message });
     }
 
+    const existingVacation = await vacationModel.findById(vacation);
+    if (!existingVacation) {
+      return res.status(404).json({ message: "Không tìm thấy kỳ nghỉ" });
+    }
+
+    if (milestone) {
+      const existMilestone = await milestoneModel.findById(milestone);
+
+      if (!existMilestone) {
+        return res.status(400).json({ error: "Milestone không tồn tại" });
+      }
+    } else {
+      const { time, desc } = milestone;
+      if (
+        new Date(time).getTime() >
+          new Date(existingVacation.endedAt).getTime() ||
+        new Date(time).getTime() <
+          new Date(existingVacation.startedAt).getTime()
+      ) {
+        return res
+          .status(400)
+          .json({ message: "Thời gian nằm ngoài kỳ nghỉ. Hãy nhập lại" });
+      }
+      const newMilestone = await milestoneModel.create({
+        time,
+        desc,
+        vacation: vacationId,
+      });
+      vacation.milestones.push(newMilestone);
+      await vacation.save();
+    }
+
+    let data;
+    if (file.mimetype.startsWith("image/")) {
+      data = await uploadImage(file);
+    } else if (file.mimetype.startsWith("video/")) {
+      data = await uploadVideo(file);
+    } else {
+      return res.status(400).json({ error: "Loại tệp không được hỗ trợ" });
+    }
+
+    // const data = await uploadImage(images);
+
     const post = await postModel.create({
       postBy: userId,
-      milestone,
+      vacation: vacation,
+      milestone: milestone,
       content,
       likes,
       comments,
@@ -74,19 +116,33 @@ const createPost = async (req, res) => {
 const likePost = async (req, res) => {
   try {
     const postId = req.params.id;
-    const {userId} = req.body;
+    const { userId } = req.body;
 
-    const post =await postModel.findById(postId);
+    const post = await postModel.findById(postId);
 
     if (!post) {
       return res.status(400).json({ message: "Bài post không tồn tại" });
     }
-    if (post.likes?.includes(userId)) {
-      post.likes = post.likes.filter((pid) => pid !== userId);
+
+    const vacation = await vacationModel.findById(post.vacation);
+
+    if (post.likes?.uId?.includes(userId)) {
+      await postModel.updateOne(
+        { _id: postId },
+        { $inc: { "likes.total": -1 }, $pull: { "likes.uId": userId } },
+        { new: true }
+      );
+      vacation.updateOne({ $inc: { "likes.total": -1 } });
     } else {
-      post.likes?.push(userId);
+      await postModel.updateOne(
+        { _id: postId },
+        { $inc: { "likes.total": 1 }, $push: { "likes.uId": userId } },
+        { new: true }
+      );
+      vacation.updateOne({ $inc: { "likes.total": 1 } });
     }
-    await post.save();
+    await vacation.save();
+    console.log(vacation.likes);
     return res.status(200).json({
       sucess: true,
       data: post,

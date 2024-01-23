@@ -2,6 +2,7 @@ const vacationModel = require("../../models/vacation");
 const milestoneModel = require("../../models/milestone");
 const { vacationSchema } = require("../vacation/validation");
 const { createMilestone } = require("../milestone");
+const { finished } = require("nodemailer/lib/xoauth2");
 
 const getVacation = async (req, res) => {
   try {
@@ -160,6 +161,8 @@ const createVacation = async (req, res) => {
       });
     }
 
+    //kiểm tra xem người dùng có tạo milestone không,
+    //nếu có thì tạo milestone
     if (milestones?.length != 0) {
       for (let i = 0; i < milestones?.length; i++) {
         const vacationId = vacation._id;
@@ -242,8 +245,7 @@ const updateVacation = async (req, res) => {
     existingVacation.startedAt = startedAt || existingVacation.startedAt;
     existingVacation.endedAt = endedAt || existingVacation.endedAt;
     existingVacation.privacy = privacy || existingVacation.privacy;
-    existingVacation.userChoose =
-      userChoose || existingVacation.userChoose;
+    existingVacation.userChoose = userChoose || existingVacation.userChoose;
     existingVacation.status = status || existingVacation.status;
     existingVacation.participants =
       participants || existingVacation.participants;
@@ -256,6 +258,32 @@ const updateVacation = async (req, res) => {
       sucess: true,
       message: "Cập nhật kỳ nghỉ thành công",
       data: updatedVacation,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({ message: error.message });
+  }
+};
+
+const finishVacation = async (req, res) => {
+  try {
+    const vacationId = req.params._id;
+    const status = req.body.status;
+
+    let statusUpdate =  {status} ;
+
+    const finishVacation = await vacationModel.findOneAndUpdate(
+      vacationId,
+      statusUpdate,
+      { new: true }
+    );
+
+    // await finishVacation.save();
+
+    return res.status(200).json({
+      sucess: true,
+      message: "Kết thúc kỳ nghỉ thành công",
+      data: finishVacation,
     });
   } catch (error) {
     console.log(error);
@@ -281,8 +309,9 @@ const deleteVacation = async (req, res) => {
 module.exports = {
   getVacation,
   getAllVacations,
+  getVacationOnPageUser,
   createVacation,
   updateVacation,
+  finishVacation,
   deleteVacation,
-  getVacationOnPageUser,
 };
