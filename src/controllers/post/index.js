@@ -56,7 +56,7 @@ const createPost = async (req, res) => {
         return res.status(400).json({ error: "Milestone không tồn tại" });
       }
     } else {
-      const { time, desc } = milestone;
+      const { time, desc } = JSON.parse(milestone);
       if (
         new Date(time).getTime() >
           new Date(existingVacation.endedAt).getTime() ||

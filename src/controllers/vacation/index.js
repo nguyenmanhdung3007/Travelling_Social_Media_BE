@@ -60,6 +60,37 @@ const getVacationOnPageUser = async (req, res) => {
   }
 };
 
+const getVacationInProgessOfUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    const vacation = await vacationModel
+      .find({
+        $and: [
+          { createdBy: userId },
+          { status: "In Progress" },
+        ],
+      })
+      .populate("comments")
+      .populate("milestones")
+      .populate({ path: "userChoose", select: "-password" })
+      .populate({ path: "participants", select: "-password" });
+
+    if (vacation.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "Không có vacation nào cả" });
+    }
+
+    res.status(200).json({ success: true, data: vacation });
+  } catch (error) {
+    console.log(error.message);
+    return res
+      .status(404)
+      .json({ message: "Đã xảy ra lỗi trong quá trình load kỳ nghỉ" });
+  }
+};
+
 const getAllVacations = async (req, res) => {
   try {
     const pageIndex = req.query.pageIndex || 1;
@@ -310,6 +341,7 @@ module.exports = {
   getVacation,
   getAllVacations,
   getVacationOnPageUser,
+  getVacationInProgessOfUser,
   createVacation,
   updateVacation,
   finishVacation,
