@@ -1,3 +1,4 @@
+const { string } = require("joi");
 const mongoose = require("mongoose");
 
 const basicInfo = new mongoose.Schema({
@@ -11,6 +12,12 @@ const basicInfo = new mongoose.Schema({
   dateOfBirth: { type: Date },
   age: { type: Number },
   gender: { type: String },
+  vacations: {
+    inProgess: [{type: String}],
+    finished: [{type: String}],
+    intention: [{type: String}],
+  }
+
 
 });
 

@@ -8,12 +8,13 @@ const {
   finishVacation,
   getVacationInProgessOfUser,
 } = require("../controllers/vacation");
+const verifyToken = require("../middlewares/authentication");
 const upload = require("../util/multer");
 
 const router = require("express").Router();
 
 /*--Vacation--*/
-router.post("/create/:id", createVacation);
+router.post("/create",verifyToken, createVacation);
 router.get("/get-all-vacations/", getAllVacations);
 router.get("/detail/:id", getVacation);
 router.get("/:id", getVacationOnPageUser);
