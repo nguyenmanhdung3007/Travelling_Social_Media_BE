@@ -61,7 +61,7 @@ const updateUser = async (req, res) => {
       { _id: userId },
       { fullName, userName, dateOfBirth, gender, age: this.age },
       { new: true }
-    );
+    ).select('-password');
 
     return res.status(200).json({
       message: "Update người dùng thành công",

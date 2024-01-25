@@ -3,7 +3,7 @@ const Joi = require("joi");
 const userSchema = Joi.object({
   fullName: Joi.string().required(),
   bio: Joi.string(),
-  dateOfBirth: Joi.date(),
+  dateOfBirth: Joi.date().required(),
   gender: Joi.string(),
 });
 
