@@ -315,6 +315,13 @@ const finishVacation = async (req, res) => {
 
     let statusUpdate = { status };
 
+    // Kiểm tra xem người đăng nhập có quyền kết thúc kỳ nghỉ không
+    if (req.userId.toString() !== existingVacation.createdBy.toString()) {
+      return res.status(403).json({
+        message: "Bạn không có quyền cập nhật kỳ nghỉ",
+      });
+    }
+
     const finishVacation = await vacationModel.findOneAndUpdate(
       vacationId,
       statusUpdate,

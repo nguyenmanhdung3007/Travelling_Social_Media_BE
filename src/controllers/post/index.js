@@ -131,7 +131,7 @@ const createPost = async (req, res) => {
 const likePost = async (req, res) => {
   try {
     const postId = req.params.id;
-    const { userId } = req.body;
+    const userId  = req.userId;
 
     const post = await postModel.findById(postId);
 
