@@ -6,6 +6,11 @@ const milestoneModel = require("../../models/milestone");
 const vacation = require("../../models/vacation");
 const { exist } = require("joi");
 
+
+
+
+
+
 const getPost = async (req, res) => {
   try {
     const postId = req.params.id;
@@ -142,14 +147,24 @@ const likePost = async (req, res) => {
         { $inc: { "likes.total": -1 }, $pull: { "likes.uId": userId } },
         { new: true }
       );
-      vacation.updateOne({ $inc: { "likes.total": -1 } });
+      await vacationModel.updateOne(
+        { _id: post.vacation },
+        { $inc: { "likes.total": -1 } },
+        { new: true }
+      );
+      // vacation.updateOne({ $inc: { "likes.total": -1 } });
     } else {
       await postModel.updateOne(
         { _id: postId },
         { $inc: { "likes.total": 1 }, $push: { "likes.uId": userId } },
         { new: true }
       );
-      vacation.updateOne({ $inc: { "likes.total": 1 } });
+      await vacationModel.updateOne(
+        { _id: post.vacation },
+        { $inc: { "likes.total": 1 } },
+        { new: true }
+      );
+      // vacation.updateOne({ $inc: { "likes.total": 1 } });
     }
     await vacation.save();
     console.log(vacation.likes);
