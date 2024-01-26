@@ -104,7 +104,7 @@ exports.login = async (req, res, next) => {
             if (err) {
               return res.json({ status: "fail", msg: "Invalid token" });
             }
-
+            console.log(decodedToken);
             try {
               const doc = await User.findOne({ _id: decodedToken.userID });
 
@@ -112,12 +112,10 @@ exports.login = async (req, res, next) => {
                 return res.json({ status: "fail", msg: "User not found" });
               }
 
-              return res.json({
-                status: "success",
-                msg: "Login successful!",
-                token: token,
-                data: doc,
-              });
+              req.userId = decodedToken.userID;
+              req.user = doc;
+              next();
+
             } catch (err) {
               return res.json({ status: "fail", msg: "Server error" });
             }

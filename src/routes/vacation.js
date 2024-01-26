@@ -1,4 +1,5 @@
 const { createMilestone, getMilestone } = require("../controllers/milestone");
+const { login } = require("../controllers/users/userController");
 const {
   createVacation,
   updateVacation,
@@ -14,13 +15,13 @@ const upload = require("../util/multer");
 const router = require("express").Router();
 
 /*--Vacation--*/
-router.post("/create",verifyToken, createVacation);
-router.get("/get-all-vacations/", getAllVacations);
+router.post("/create",login, createVacation);
+router.get("/get-all-vacations/",login, getAllVacations);
 router.get("/detail/:id", getVacation);
-router.get("/:id", getVacationOnPageUser);
-router.get("/in-progess/:id", getVacationInProgessOfUser);
+router.get("/:id", login,getVacationOnPageUser);
+router.get("/in-progess/:id",login, getVacationInProgessOfUser);
 
-router.patch("/:id", updateVacation);
+router.patch("/:id",login, updateVacation);
 router.patch("/finish/:id", finishVacation);
 
 /*--MileStone--*/
