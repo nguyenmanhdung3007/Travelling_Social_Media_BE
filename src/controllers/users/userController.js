@@ -87,6 +87,7 @@ exports.login = async (req, res, next) => {
       }
 
       const token = createJwtToken(staff._id);
+      staff.password = undefined;
       return res.json({
         status: "success",
         msg: "Login successful",
@@ -111,7 +112,7 @@ exports.login = async (req, res, next) => {
               if (!doc) {
                 return res.json({ status: "fail", msg: "User not found" });
               }
-
+              doc.password = undefined;
               return res.json({
                 status: "success",
                 msg: "Login successful!",
