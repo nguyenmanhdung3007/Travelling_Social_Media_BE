@@ -63,16 +63,17 @@ const updateUser = async (req, res) => {
     console.log(data);
     if (data?.avatar) {
       if (data.avatar[0].mimetype.startsWith("image/")) {
-        avatar = await uploadImage(data?.avatar);
+        avatar = await uploadImage(data?.avatar[0]);
       } else {
         return res.status(400).json({ error: "Loại tệp không được hỗ trợ" });
       }
     } else {
       avatar = null;
     }
+
     if (data?.cover) {
       if (data.cover[0].mimetype.startsWith("image/")) {
-        cover = await uploadImage(data?.cover);
+        cover = await uploadImage(data?.cover[0]);
       } else {
         return res.status(400).json({ error: "Loại tệp không được hỗ trợ" });
       }
@@ -82,7 +83,7 @@ const updateUser = async (req, res) => {
 
     const user = await User.findByIdAndUpdate(
       { _id: userId },
-      { fullName, userName, dateOfBirth, gender, avatar, cover, age: this.age },
+      { fullName, userName, dateOfBirth, gender, avatar: avatar, cover: cover, age: this.age },
       { new: true }
     ).select("-password");
 
