@@ -6,6 +6,11 @@ const milestoneModel = require("../../models/milestone");
 const vacation = require("../../models/vacation");
 const { exist } = require("joi");
 
+
+
+
+
+
 const getPost = async (req, res) => {
   try {
     const postId = req.params.id;
@@ -30,10 +35,10 @@ const getPost = async (req, res) => {
 
 const createPost = async (req, res) => {
   try {
-    const userId = req.params.id;
+    const userId = req.userId;
     const { vacation, milestone, content, likes, comments } = req.body;
     const file = req.file;
-    console.log(file)
+    console.log(file);
 
     const validate = postSchema.validate({
       vacation,
@@ -47,6 +52,16 @@ const createPost = async (req, res) => {
     const existingVacation = await vacationModel.findById(vacation);
     if (!existingVacation) {
       return res.status(404).json({ message: "Không tìm thấy kỳ nghỉ" });
+    }
+
+    // Kiểm tra xem user có được post bài k
+    if (
+      req.userId.toString() !== existingVacation.createdBy.toString() &&
+      !existingVacation.participants?.includes(req.userId.toString())
+    ) {
+      return res.status(403).json({
+        message: "Bạn không có quyền cập nhật kỳ nghỉ",
+      });
     }
 
     if (milestone) {
@@ -132,14 +147,24 @@ const likePost = async (req, res) => {
         { $inc: { "likes.total": -1 }, $pull: { "likes.uId": userId } },
         { new: true }
       );
-      vacation.updateOne({ $inc: { "likes.total": -1 } });
+      await vacationModel.updateOne(
+        { _id: post.vacation },
+        { $inc: { "likes.total": -1 } },
+        { new: true }
+      );
+      // vacation.updateOne({ $inc: { "likes.total": -1 } });
     } else {
       await postModel.updateOne(
         { _id: postId },
         { $inc: { "likes.total": 1 }, $push: { "likes.uId": userId } },
         { new: true }
       );
-      vacation.updateOne({ $inc: { "likes.total": 1 } });
+      await vacationModel.updateOne(
+        { _id: post.vacation },
+        { $inc: { "likes.total": 1 } },
+        { new: true }
+      );
+      // vacation.updateOne({ $inc: { "likes.total": 1 } });
     }
     await vacation.save();
     console.log(vacation.likes);

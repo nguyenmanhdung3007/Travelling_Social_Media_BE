@@ -105,14 +105,14 @@ exports.login = async (req, res, next) => {
             if (err) {
               return res.json({ status: "fail", msg: "Invalid token" });
             }
-
+            console.log(decodedToken);
             try {
               const doc = await User.findOne({ _id: decodedToken.userID });
 
               if (!doc) {
                 return res.json({ status: "fail", msg: "User not found" });
               }
-              doc.password = undefined;
+
               return res.json({
                 status: "success",
                 msg: "Login successful!",
