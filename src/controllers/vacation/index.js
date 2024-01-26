@@ -31,7 +31,7 @@ const getVacation = async (req, res) => {
 
 const getVacationOnPageUser = async (req, res) => {
   try {
-    const userId = req.params.id;
+    const userId = req.userId;
 
     const vacations = await vacationModel
       .find({
@@ -61,7 +61,7 @@ const getVacationOnPageUser = async (req, res) => {
 
 const getVacationInProgessOfUser = async (req, res) => {
   try {
-    const userId = req.params.id;
+    const userId = req.userId;
 
     const vacation = await vacationModel
       .find({
@@ -89,7 +89,7 @@ const getAllVacations = async (req, res) => {
   try {
     const pageIndex = req.query.pageIndex || 1;
     const pageSize = req.query.pageSize || 5;
-    const { userId } = req.body;
+    const userId = req.userId;
 
     const vacations = await vacationModel
       .find({
@@ -121,7 +121,7 @@ const getAllVacations = async (req, res) => {
 
 const createVacation = async (req, res) => {
   try {
-    const userId = req.user;
+    const userId = req.userId;
     const {
       title,
       desc,
@@ -129,7 +129,7 @@ const createVacation = async (req, res) => {
       endedAt,
       privacy,
       userChoose,
-      // status,
+      status,
       participants,
       milestones,
     } = req.body;
@@ -140,7 +140,7 @@ const createVacation = async (req, res) => {
       startedAt,
       endedAt,
       // privacy,
-      // status,
+      status,
     });
 
     if (validate.error) {
@@ -223,10 +223,10 @@ const createVacation = async (req, res) => {
       }
     }
 
-    await User.findOneAndUpdate(
-      { _id: userId },
-      { $push: { "vacations.inProgess": vacation._id } }
-    );
+    // await User.findOneAndUpdate(
+    //   { _id: userId },
+    //   { $push: { "vacations.inProgess": vacation._id } }
+    // );
 
     res.status(200).json({
       sucess: true,
@@ -253,11 +253,11 @@ const updateVacation = async (req, res) => {
     }
 
     // Kiểm tra xem người đăng nhập có quyền cập nhật kỳ nghỉ không
-    // if (req.user._id.toString() !== existingVacation.createdBy.toString()) {
-    //   return res.status(403).json({
-    //     message: "Bạn không có quyền cập nhật kỳ nghỉ",
-    //   });
-    // }
+    if (req.userId.toString() !== existingVacation.createdBy.toString()) {
+      return res.status(403).json({
+        message: "Bạn không có quyền cập nhật kỳ nghỉ",
+      });
+    }
 
     // Lấy thông tin cập nhật từ req.body
     const {

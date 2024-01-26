@@ -30,10 +30,10 @@ const getPost = async (req, res) => {
 
 const createPost = async (req, res) => {
   try {
-    const userId = req.params.id;
+    const userId = req.userId;
     const { vacation, milestone, content, likes, comments } = req.body;
     const file = req.file;
-    console.log(file)
+    console.log(file);
 
     const validate = postSchema.validate({
       vacation,
@@ -47,6 +47,16 @@ const createPost = async (req, res) => {
     const existingVacation = await vacationModel.findById(vacation);
     if (!existingVacation) {
       return res.status(404).json({ message: "Không tìm thấy kỳ nghỉ" });
+    }
+
+    // Kiểm tra xem user có được post bài k
+    if (
+      req.userId.toString() !== existingVacation.createdBy.toString() &&
+      !existingVacation.participants?.includes(req.userId.toString())
+    ) {
+      return res.status(403).json({
+        message: "Bạn không có quyền cập nhật kỳ nghỉ",
+      });
     }
 
     if (milestone) {
