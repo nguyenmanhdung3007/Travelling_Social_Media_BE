@@ -17,7 +17,7 @@ router.post("/changepass/:id", userController.userChangePass);
 router.get("/get_all_user", getAllUser);
 router.get("/get_user/:id", getUser);
 
-router.put("/profile/update/:id", upload.single("avatar"), updateUser);
+router.put("/profile/update/:id", upload.fields([{ name: 'avatar', maxCount: 1 }, { name: 'cover', maxCount: 1 }]), updateUser);
 
 // thong tin nguoi dung
 router.post("/userinfo", async (req, res) => {
