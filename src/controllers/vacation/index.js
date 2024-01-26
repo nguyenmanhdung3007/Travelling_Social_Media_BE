@@ -315,6 +315,10 @@ const finishVacation = async (req, res) => {
 
     let statusUpdate = { status };
 
+    const existingVacation = await vacationModel.findById(vacationId);
+    if (!existingVacation) {
+      return res.status(404).json({ message: "Không tìm thấy kỳ nghỉ" });
+    }
     // Kiểm tra xem người đăng nhập có quyền kết thúc kỳ nghỉ không
     if (req.userId.toString() !== existingVacation.createdBy.toString()) {
       return res.status(403).json({
@@ -344,6 +348,13 @@ const finishVacation = async (req, res) => {
 const deleteVacation = async (req, res) => {
   try {
     const vacationId = req.params._id;
+
+    // Kiểm tra xem người đăng nhập có quyền xóa kỳ nghỉ không
+    if (req.userId.toString() !== existingVacation.createdBy.toString()) {
+      return res.status(403).json({
+        message: "Bạn không có quyền cập nhật kỳ nghỉ",
+      });
+    }
 
     const deletedVacation = await vacationModel.findByIdAndDelete(vacationId);
 

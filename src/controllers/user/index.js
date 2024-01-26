@@ -67,9 +67,7 @@ const updateUser = async (req, res) => {
       } else {
         return res.status(400).json({ error: "Loại tệp không được hỗ trợ" });
       }
-    } else {
-      avatar = null;
-    }
+    } 
 
     if (data?.cover) {
       if (data.cover[0].mimetype.startsWith("image/")) {
@@ -77,9 +75,7 @@ const updateUser = async (req, res) => {
       } else {
         return res.status(400).json({ error: "Loại tệp không được hỗ trợ" });
       }
-    } else {
-      cover = null;
-    }
+    } 
 
     const user = await User.findByIdAndUpdate(
       { _id: userId },
@@ -98,7 +94,7 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   try {
-    const userId = req.params.id;
+    const userId = req.userId;
 
     const user = await User.findByIdAndDelete(userId);
 
