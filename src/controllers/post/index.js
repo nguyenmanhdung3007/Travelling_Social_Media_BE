@@ -5,6 +5,7 @@ const { postSchema } = require("../post/validation");
 const milestoneModel = require("../../models/milestone");
 const vacation = require("../../models/vacation");
 const { exist } = require("joi");
+const { default: mongoose } = require("mongoose");
 
 const getPost = async (req, res) => {
   try {
@@ -59,14 +60,13 @@ const createPost = async (req, res) => {
       });
     }
 
-    console.log(JSON.parse(milestone));
     let milestoneId;
-    if (milestone) {
+    if (mongoose.Types.ObjectId.isValid(milestone)) {
       const existMilestone = await milestoneModel.findById(milestone);
 
       if (!existMilestone) {
         return res.status(400).json({ error: "Milestone không tồn tại" });
-      }    
+      }
       milestoneId = milestone;
     } else {
       console.log(milestone);
@@ -85,11 +85,11 @@ const createPost = async (req, res) => {
       const newMilestone = await milestoneModel.create({
         time,
         desc,
-        vacation: vacationId,
+        vacation: vacation,
       });
-      vacation.milestones.push(newMilestone);
-      await vacation.save();
-      milestoneId = newMilestone._id;
+      existingVacation.milestones.push(newMilestone);
+      await existingVacation.save();
+      milestoneId = String(newMilestone._id);
     }
 
     let data;
@@ -113,7 +113,7 @@ const createPost = async (req, res) => {
       images: data,
     });
 
-    const milestoneObj = await milestoneModel.findById(milestone);
+    const milestoneObj = await milestoneModel.findById(milestoneId);
 
     milestoneObj.posts.push(post);
     milestoneObj.save();
@@ -133,7 +133,7 @@ const likePost = async (req, res) => {
   try {
     const postId = req.params.id;
     const userId = req.userId;
-    console.log(userId)
+    console.log(userId);
 
     const post = await postModel.findById(postId);
 
