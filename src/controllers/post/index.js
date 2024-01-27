@@ -6,11 +6,6 @@ const milestoneModel = require("../../models/milestone");
 const vacation = require("../../models/vacation");
 const { exist } = require("joi");
 
-
-
-
-
-
 const getPost = async (req, res) => {
   try {
     const postId = req.params.id;
@@ -38,7 +33,7 @@ const createPost = async (req, res) => {
     const userId = req.userId;
     const { vacation, milestone, content, likes, comments } = req.body;
     const file = req.file;
-    console.log(file);
+    console.log(req.body);
 
     const validate = postSchema.validate({
       vacation,
@@ -64,14 +59,19 @@ const createPost = async (req, res) => {
       });
     }
 
+    console.log(JSON.parse(milestone));
+    let milestoneId;
     if (milestone) {
       const existMilestone = await milestoneModel.findById(milestone);
 
       if (!existMilestone) {
         return res.status(400).json({ error: "Milestone không tồn tại" });
-      }
+      }    
+      milestoneId = milestone;
     } else {
+      console.log(milestone);
       const { time, desc } = JSON.parse(milestone);
+      console.log(73);
       if (
         new Date(time).getTime() >
           new Date(existingVacation.endedAt).getTime() ||
@@ -89,6 +89,7 @@ const createPost = async (req, res) => {
       });
       vacation.milestones.push(newMilestone);
       await vacation.save();
+      milestoneId = newMilestone._id;
     }
 
     let data;
@@ -105,7 +106,7 @@ const createPost = async (req, res) => {
     const post = await postModel.create({
       postBy: userId,
       vacation: vacation,
-      milestone: milestone,
+      milestone: milestoneId,
       content,
       likes,
       comments,
@@ -131,7 +132,8 @@ const createPost = async (req, res) => {
 const likePost = async (req, res) => {
   try {
     const postId = req.params.id;
-    const userId  = req.userId;
+    const userId = req.userId;
+    console.log(userId)
 
     const post = await postModel.findById(postId);
 
@@ -147,27 +149,27 @@ const likePost = async (req, res) => {
         { $inc: { "likes.total": -1 }, $pull: { "likes.uId": userId } },
         { new: true }
       );
-      await vacationModel.updateOne(
-        { _id: post.vacation },
-        { $inc: { "likes.total": -1 } },
-        { new: true }
-      );
-      // vacation.updateOne({ $inc: { "likes.total": -1 } });
+      // await vacationModel.updateOne(
+      //   { _id: post.vacation },
+      //   { $inc: { "likes.total": -1 } },
+      //   { new: true }
+      // );
+      vacation.updateOne({ $inc: { "likes.total": -1 } });
     } else {
       await postModel.updateOne(
         { _id: postId },
         { $inc: { "likes.total": 1 }, $push: { "likes.uId": userId } },
         { new: true }
       );
-      await vacationModel.updateOne(
-        { _id: post.vacation },
-        { $inc: { "likes.total": 1 } },
-        { new: true }
-      );
-      // vacation.updateOne({ $inc: { "likes.total": 1 } });
+      // await vacationModel.updateOne(
+      //   { _id: post.vacation },
+      //   { $inc: { "likes.total": 1 } },
+      //   { new: true }
+      // );
+      vacation.updateOne({ $inc: { "likes.total": 1 } });
     }
     await vacation.save();
-    console.log(vacation.likes);
+    console.log(vacation);
     return res.status(200).json({
       sucess: true,
       data: post,
