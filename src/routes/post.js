@@ -12,6 +12,6 @@ router.get("/detail/:id", getPost);
 
 
 /*--react--*/
-router.patch("/:id/like", likePost);
+router.patch("/:id/like",login, likePost);
 
 module.exports = router;
