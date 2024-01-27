@@ -15,7 +15,7 @@ router.post("/changepass/:id", userController.userChangePass);
 // --- end user ----
 
 router.get("/get_all_user", getAllUser);
-router.get("/get_user/:id", getUser);
+router.get("/get_user/",userController.login, getUser);
 
 router.put("/profile/update/:id", upload.fields([{ name: 'avatar', maxCount: 1 }, { name: 'cover', maxCount: 1 }]), updateUser);
 

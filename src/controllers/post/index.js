@@ -19,7 +19,7 @@ const getPost = async (req, res) => {
 
     return res.status(200).json({
       sucess: true,
-      data: post,
+      data: { post, query: req.query },
     });
   } catch (error) {
     console.log(error);
