@@ -15,7 +15,7 @@ const getAllUser = async (req, res) => {
 
 const getUser = async (req, res) => {
   try {
-    const userId = req.params.id;
+    const userId = req.userId;
 
     const user = await User.findById(userId).select("-password");
     return res.status(200).json({
