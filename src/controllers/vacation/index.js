@@ -13,6 +13,12 @@ const getVacation = async (req, res) => {
       .findById(vacationId)
       .populate("comments")
       .populate("milestones")
+      .populate({
+        path: 'milestones',
+        populate: {
+          path: 'posts', // thay 'fieldName' bằng tên trường bạn muốn populate
+        }
+      })
       .populate({ path: "createdBy", select: "-password" })
       .populate({ path: "userChoose", select: "-password" })
       .populate({ path: "participants", select: "-password" });
