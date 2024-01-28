@@ -19,7 +19,7 @@ const getPost = async (req, res) => {
 
     return res.status(200).json({
       sucess: true,
-      data: { post, query: req.query },
+      data: { post },
     });
   } catch (error) {
     console.log(error);
@@ -133,7 +133,6 @@ const likePost = async (req, res) => {
   try {
     const postId = req.params.id;
     const userId = req.userId;
-    console.log(userId);
 
     const post = await postModel.findById(postId);
 
@@ -149,27 +148,23 @@ const likePost = async (req, res) => {
         { $inc: { "likes.total": -1 }, $pull: { "likes.uId": userId } },
         { new: true }
       );
-      // await vacationModel.updateOne(
-      //   { _id: post.vacation },
-      //   { $inc: { "likes.total": -1 } },
-      //   { new: true }
-      // );
-      vacation.updateOne({ $inc: { "likes.total": -1 } });
+      vacation.updateOne({
+        $inc: { "likes.total": -1 },
+        $pull: { "likes.uId": userId },
+      });
     } else {
       await postModel.updateOne(
         { _id: postId },
         { $inc: { "likes.total": 1 }, $push: { "likes.uId": userId } },
         { new: true }
       );
-      // await vacationModel.updateOne(
-      //   { _id: post.vacation },
-      //   { $inc: { "likes.total": 1 } },
-      //   { new: true }
-      // );
-      vacation.updateOne({ $inc: { "likes.total": 1 } });
+      vacation.updateOne({
+        $inc: { "likes.total": 1 },
+        $push: { "likes.uId": userId },
+      });
     }
     await vacation.save();
-    console.log(vacation);
+    console.log(vacation.likes);
     return res.status(200).json({
       sucess: true,
       data: post,
