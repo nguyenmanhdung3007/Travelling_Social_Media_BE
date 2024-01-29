@@ -17,7 +17,7 @@ const getVacation = async (req, res) => {
         path: 'milestones',
         populate: {
           path: 'posts', populate: {
-            path: 'postBy', select: "fullName userName"
+            path: 'postBy', select: "fullName userName avatar"
           }
         }
       })
