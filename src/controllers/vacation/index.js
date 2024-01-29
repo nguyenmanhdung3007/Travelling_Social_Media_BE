@@ -16,7 +16,9 @@ const getVacation = async (req, res) => {
       .populate({
         path: 'milestones',
         populate: {
-          path: 'posts', // thay 'fieldName' bằng tên trường bạn muốn populate
+          path: 'posts', populate: {
+            path: 'postBy', select: "fullName userName"
+          }
         }
       })
       .populate({ path: "createdBy", select: "-password" })
