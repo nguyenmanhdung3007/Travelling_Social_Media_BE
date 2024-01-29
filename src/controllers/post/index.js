@@ -141,6 +141,7 @@ const likePost = async (req, res) => {
     }
 
     const vacation = await vacationModel.findById(post.vacation);
+    console.log(vacation);
 
     if (post.likes?.uId?.includes(userId)) {
       await postModel.updateOne(
@@ -148,22 +149,32 @@ const likePost = async (req, res) => {
         { $inc: { "likes.total": -1 }, $pull: { "likes.uId": userId } },
         { new: true }
       );
-      vacation.updateOne({
-        $inc: { "likes.total": -1 },
-        $pull: { "likes.uId": userId },
-      });
+      await vacationModel.updateOne(
+        { _id: post.vacation },
+        { $inc: { "likes.total": -1 } },
+        { new: true }
+      );
+      // vacation.updateOne({
+      //   $inc: { "likes.total": -1 },
+      //   $pull: { "likes.uId": userId },
+      // });
     } else {
       await postModel.updateOne(
         { _id: postId },
         { $inc: { "likes.total": 1 }, $push: { "likes.uId": userId } },
         { new: true }
       );
-      vacation.updateOne({
-        $inc: { "likes.total": 1 },
-        $push: { "likes.uId": userId },
-      });
+      await vacationModel.updateOne(
+        { _id: post.vacation },
+        { $inc: { "likes.total": 1 } },
+        { new: true }
+      );
+      // vacation.updateOne({
+      //   $inc: { "likes.total": 1 },
+      //   $push: { "likes.uId": userId },
+      // });
     }
-    await vacation.save();
+    // await vacation.save();
     console.log(vacation.likes);
     return res.status(200).json({
       sucess: true,
