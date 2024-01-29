@@ -6,13 +6,22 @@ const createComment = async (req, res) => {
   try {
     // const id = req.body;
     const postId = req.params.id;
-    const { userId, comment } = req.body;
+    const { comment } = req.body;
+    const userId = req.user;
+    console.log(userId)
+
+    const post = await postModel.findById(postId);
+
+    if (!post) {
+      return res.status(400).json({ message: "Bài post không tồn tại" });
+    }
 
     if (comment === null) {
       return res.status(404).json({ message: "Hãy viết comment của bạn" });
     }
-    
+
     const user = await User.findById(userId);
+    console.log(user);
     const from = user.userName;
 
     const newComment = await commentModel.create({
@@ -23,8 +32,6 @@ const createComment = async (req, res) => {
     });
 
     //updating the post with the comments id
-    const post = await postModel.findById(postId);
-
     await post.comments.push(newComment._id);
 
     await post.save();

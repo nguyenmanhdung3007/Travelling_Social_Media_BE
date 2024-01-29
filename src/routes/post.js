@@ -6,7 +6,7 @@ const upload = require('../util/multer')
 const router = require("express").Router();
 
 router.post("/create-post",login, upload.single("images"), createPost);
-router.post("/detail/:id", createComment);
+router.post("/detail/:id",login, createComment);
 
 router.get("/detail/:id", getPost);
 
