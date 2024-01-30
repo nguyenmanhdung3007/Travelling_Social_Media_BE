@@ -50,7 +50,6 @@ const getComment = async (req, res) => {
       .findById(commentId)
       .populate("post")
       .populate({ path: "userId", select: "-password" })
-      .populate({ path: "comments", select: "-password" });
 
     return res.status(200).json({
       sucess: true,

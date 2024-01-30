@@ -14,8 +14,14 @@ const getPost = async (req, res) => {
     const post = await postModel
       .findById(postId)
       .populate("milestone")
+      .populate("vacation")
       .populate({ path: "postBy", select: "-password" })
-      .populate({ path: "comments", select: "-password" });
+      .populate({ path: "comments",
+        populate: {
+          path: "postBy",
+          select: "fullName userName avatar",
+        },
+      });
 
     return res.status(200).json({
       sucess: true,
@@ -34,7 +40,8 @@ const createPost = async (req, res) => {
     const userId = req.userId;
     const { vacation, milestone, content, likes, comments } = req.body;
     const file = req.file;
-    console.log(req.body);
+    console.log(file)
+    
 
     const validate = postSchema.validate({
       vacation,

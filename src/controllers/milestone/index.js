@@ -2,7 +2,7 @@ const milestoneModel = require("../../models/milestone");
 const { milestoneSchema } = require("./validation");
 const vacationModel = require("../../models/vacation");
 
-const createMilestone = async (req, res) => {   
+const createMilestone = async (req, res) => {
   try {
     const vacationId = req.params.id;
     const { time, desc } = req.body;
@@ -48,6 +48,11 @@ const createMilestone = async (req, res) => {
 const getMilestone = async (req, res) => {
   try {
     const milestoneId = req.params.id;
+
+    const existingMilestone = await milestoneModel.findById(milestoneId);
+    if (!existingMilestone) {
+      return res.status(404).json({ message: "Không tìm thấy kỳ nghỉ" });
+    }
 
     const milestone = await milestoneModel
       .findById(milestoneId)

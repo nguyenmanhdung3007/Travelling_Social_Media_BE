@@ -1,5 +1,6 @@
 const vacationModel = require("../../models/vacation");
 const milestoneModel = require("../../models/milestone");
+const postModel = require("../../models/post");
 const { vacationSchema } = require("../vacation/validation");
 const { createMilestone } = require("../milestone");
 const { finished } = require("nodemailer/lib/xoauth2");
@@ -14,16 +15,22 @@ const getVacation = async (req, res) => {
       .populate("comments")
       .populate("milestones")
       .populate({
-        path: 'milestones',
+        path: "milestones",
         populate: {
-          path: 'posts', populate: {
-            path: 'postBy', select: "fullName userName avatar"
-          }
-        }
+          path: "posts",
+          populate: {
+            path: "postBy",
+            select: "fullName userName avatar",
+          },
+        },
       })
       .populate({ path: "createdBy", select: "-password" })
       .populate({ path: "userChoose", select: "-password" })
       .populate({ path: "participants", select: "-password" });
+
+    if (!vacation) {
+      return res.status(404).json({ message: "Không tìm thấy kỳ nghỉ" });
+    }
 
     return res.status(200).json({
       sucess: true,
@@ -356,7 +363,6 @@ const finishVacation = async (req, res) => {
 const deleteVacation = async (req, res) => {
   try {
     const vacationId = req.params.id;
-    
 
     const existingVacation = await vacationModel.findById(vacationId);
     if (!existingVacation) {
@@ -370,16 +376,22 @@ const deleteVacation = async (req, res) => {
       });
     }
 
-    const deletedVacation = await vacationModel.findByIdAndDelete(vacationId);
-
-    if (deletedVacation.milestones?.length != 0){
-      for (let i = 0; i < milestones.length; i++) {
-        const element = milestones[i];
-        const milestoneObj = milestoneModel.findById(element);
+    if (existingVacation.milestones?.length != 0) {
+      for (let i = 0; i < existingVacation.milestones?.length; i++) {
+        const element = existingVacation.milestones[i];
+        const milestoneObj = await milestoneModel.findById(element);
+        console.log(milestoneObj._id);
+        if (milestoneObj?.posts?.length != 0) {
+          for (let i = 0; i < milestoneObj?.posts?.length; i++) {
+            const element = milestoneObj?.posts[i];
+            const postObj = await postModel.findById(element);
+            console.log(postObj._id);
+          }
+        }
       }
     }
 
-    console.log(deletedVacation)
+    const deletedVacation = await vacationModel.findById(vacationId);
 
     return res
       .status(200)
