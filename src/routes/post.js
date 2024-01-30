@@ -7,7 +7,7 @@ const router = require("express").Router();
 
 router.post("/create-post",login, upload.single("images"), createPost);
 
-router.get("/detail/:id", getPost);
+router.get("/detail/:id",login, getPost);
 
 
 /*--react--*/
