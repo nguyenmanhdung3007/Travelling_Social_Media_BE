@@ -18,7 +18,7 @@ const getPost = async (req, res) => {
       .populate({ path: "postBy", select: "-password" })
       .populate({ path: "comments",
         populate: {
-          path: "postBy",
+          path: "userId",
           select: "fullName userName avatar",
         },
       });
