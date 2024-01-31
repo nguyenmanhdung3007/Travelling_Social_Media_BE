@@ -211,7 +211,7 @@ const createVacation = async (req, res) => {
         participants,
         privacy,
         status,
-        views
+        views,
       });
     }
 
@@ -309,8 +309,7 @@ const updateVacation = async (req, res) => {
     existingVacation.status = status || existingVacation.status;
     existingVacation.participants =
       participants || existingVacation.participants;
-    existingVacation.views =
-      views || existingVacation.views;
+    existingVacation.views = views || existingVacation.views;
 
     // Lưu kỳ nghỉ đã được cập nhật vào cơ sở dữ liệu
     const updatedVacation = await existingVacation.save();
@@ -323,7 +322,10 @@ const updateVacation = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(404).json({ message: error.message, message: "Đã xảy ra lỗi trong quá trình cập nhật kỳ nghỉ" });
+    res.status(404).json({
+      message: error.message,
+      message: "Đã xảy ra lỗi trong quá trình cập nhật kỳ nghỉ",
+    });
   }
 };
 
@@ -360,7 +362,10 @@ const finishVacation = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(404).json({ message: error.message });
+    res.status(404).json({
+      message: error.message,
+      message: "Đã xảy ra lỗi trong quá trình kết thúc kỳ nghỉ",
+    });
   }
 };
 
@@ -389,6 +394,12 @@ const deleteVacation = async (req, res) => {
           $in: listMilestoneId,
         },
       });
+
+      await milestoneModel.deleteMany({
+        _id: {
+          $in: listMilestoneId,
+        },
+      });
       await postModel.deleteMany({
         milestone: {
           $in: listMilestoneId,
@@ -409,7 +420,10 @@ const deleteVacation = async (req, res) => {
       .json({ sucess: true, message: "Xóa kỳ nghỉ thành công" });
   } catch (error) {
     console.log(error);
-    res.status(404).json({ message: error.message });
+    res.status(404).json({
+      message: error.message,
+      message: "Đã xảy ra lỗi trong quá trình xóa kỳ nghỉ",
+    });
   }
 };
 

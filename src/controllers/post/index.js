@@ -108,8 +108,6 @@ const createPost = async (req, res) => {
       return res.status(400).json({ error: "Loại tệp không được hỗ trợ" });
     }
 
-    // const data = await uploadImage(images);
-
     const post = await postModel.create({
       postBy: userId,
       vacation: vacation,
@@ -166,7 +164,10 @@ const updatePost = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res.status(400).json({ error: error.message });
+    return res.status(400).json({
+      error: error.message,
+      message: "Đã xảy ra lỗi trong quá trình cập nhật bài viết",
+    });
   }
 };
 
@@ -195,10 +196,6 @@ const likePost = async (req, res) => {
         { $inc: { "likes.total": -1 } },
         { new: true }
       );
-      // vacation.updateOne({
-      //   $inc: { "likes.total": -1 },
-      //   $pull: { "likes.uId": userId },
-      // });
     } else {
       await postModel.updateOne(
         { _id: postId },
@@ -210,20 +207,17 @@ const likePost = async (req, res) => {
         { $inc: { "likes.total": 1 } },
         { new: true }
       );
-      // vacation.updateOne({
-      //   $inc: { "likes.total": 1 },
-      //   $push: { "likes.uId": userId },
-      // });
     }
-    // await vacation.save();
-    console.log(vacation.likes);
     return res.status(200).json({
       sucess: true,
       data: post,
     });
   } catch (error) {
     console.log(error);
-    return res.status(400).json({ error: error.message });
+    return res.status(400).json({
+      error: error.message,
+      message: "Đã xảy ra lỗi trong quá trình like bài viết",
+    });
   }
 };
 
@@ -246,8 +240,6 @@ const deletePost = async (req, res) => {
     if (existingPost.comments?.length != 0) {
       const getListComments = existingPost.comments.map((item) => item._id);
 
-      console.log(getListComments);
-
       await commentModel.deleteMany({
         postId: {
           $in: getListPost,
@@ -262,7 +254,10 @@ const deletePost = async (req, res) => {
       .json({ sucess: true, message: "Xóa bài post thành công" });
   } catch (error) {
     console.log(error);
-    res.status(404).json({ message: error.message });
+    res.status(404).json({
+      message: error.message,
+      message: "Đã xảy ra lỗi trong quá trình xóa bài viết",
+    });
   }
 };
 
