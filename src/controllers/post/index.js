@@ -141,6 +141,29 @@ const updatePost = async (req, res) => {
     const userId = req.userId;
     const { content, postId } = req.body;
 
+    const existingPost = await postModel.findById(postId);
+    if (!existingPost) {
+      return res.status(404).json({ message: "Không tìm thấy bài post" });
+    }
+
+    // Kiểm tra xem người đăng nhập có quyền xóa bài post không
+    if (req.userId.toString() !== existingPost.postBy.toString()) {
+      return res.status(403).json({
+        message: "Bạn không thể sửa bài viết của người khác",
+      });
+    }
+
+    const updatedPost = await postModel.findByIdAndUpdate(
+      { _id: postId },
+      { content: content },
+      { new: true }
+    );
+
+    return res.status(200).json({
+      sucess: true,
+      message: "Đã chỉnh sửa bài viết thành công",
+      data: updatedPost,
+    });
   } catch (error) {
     console.log(error);
     return res.status(400).json({ error: error.message });
@@ -243,4 +266,4 @@ const deletePost = async (req, res) => {
   }
 };
 
-module.exports = { createPost, getPost, likePost, deletePost };
+module.exports = { createPost, getPost, likePost, deletePost, updatePost };
