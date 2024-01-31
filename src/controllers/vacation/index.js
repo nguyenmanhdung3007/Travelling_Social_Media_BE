@@ -13,7 +13,6 @@ const getVacation = async (req, res) => {
 
     const vacation = await vacationModel
       .findById(vacationId)
-      .populate("comments")
       .populate("milestones")
       .populate({
         path: "milestones",
@@ -57,7 +56,6 @@ const getVacationOnPageUser = async (req, res) => {
           { userChoose: userId },
         ],
       })
-      .populate("comments")
       .populate("milestones")
       .populate({ path: "userChoose", select: "-password" })
       .populate({ path: "participants", select: "-password" });
