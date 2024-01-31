@@ -83,7 +83,6 @@ const getVacationInProgessOfUser = async (req, res) => {
       .find({
         $and: [{ createdBy: userId }, { status: "In Progress" }],
       })
-      .populate("comments")
       .populate("milestones")
       .populate({ path: "userChoose", select: "-password" })
       .populate({ path: "participants", select: "-password" });
