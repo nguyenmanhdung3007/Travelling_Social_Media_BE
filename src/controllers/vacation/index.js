@@ -285,7 +285,7 @@ const updateVacation = async (req, res) => {
       userChoose,
       status,
       participants,
-      view
+      views,
     } = req.body;
 
     const validate = vacationSchema.validate({
@@ -323,7 +323,7 @@ const updateVacation = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(404).json({ message: error.message });
+    res.status(404).json({ message: error.message, message: "Đã xảy ra lỗi trong quá trình cập nhật kỳ nghỉ" });
   }
 };
 

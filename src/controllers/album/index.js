@@ -3,6 +3,8 @@ const albumSchema = require("../../models/album");
 const createAlbum = async (req, res) => {
     const userId = req.userId;
     const {title, privacy} = req.body
+
+    
 };
 const getAlbum = async (req, res) => {};
 const getAllAlbum = async (req, res) => {};
