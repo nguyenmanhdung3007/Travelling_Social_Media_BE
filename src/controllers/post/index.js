@@ -16,7 +16,8 @@ const getPost = async (req, res) => {
       .populate("milestone")
       .populate("vacation")
       .populate({ path: "postBy", select: "-password" })
-      .populate({ path: "comments",
+      .populate({
+        path: "comments",
         populate: {
           path: "userId",
           select: "fullName userName avatar",
@@ -40,8 +41,7 @@ const createPost = async (req, res) => {
     const userId = req.userId;
     const { vacation, milestone, content, likes, comments } = req.body;
     const file = req.file;
-    console.log(file)
-    
+    console.log(file);
 
     const validate = postSchema.validate({
       vacation,
@@ -136,6 +136,17 @@ const createPost = async (req, res) => {
   }
 };
 
+const updatePost = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { content, postId } = req.body;
+
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ error: error.message });
+  }
+};
+
 const likePost = async (req, res) => {
   try {
     const postId = req.params.id;
@@ -193,4 +204,43 @@ const likePost = async (req, res) => {
   }
 };
 
-module.exports = { createPost, getPost, likePost };
+const deletePost = async (req, res) => {
+  try {
+    const postId = req.params.id;
+
+    const existingPost = await postModel.findById(postId);
+    if (!existingPost) {
+      return res.status(404).json({ message: "Không tìm thấy bài post" });
+    }
+
+    // Kiểm tra xem người đăng nhập có quyền xóa bài post không
+    if (req.userId.toString() !== existingPost.postBy.toString()) {
+      return res.status(403).json({
+        message: "Bạn không có quyền xóa bài post",
+      });
+    }
+
+    if (existingPost.comments?.length != 0) {
+      const getListComments = existingPost.comments.map((item) => item._id);
+
+      console.log(getListComments);
+
+      await commentModel.deleteMany({
+        postId: {
+          $in: getListPost,
+        },
+      });
+    }
+
+    const deletedPost = await postModel.findByIdAndDelete(postId);
+
+    return res
+      .status(200)
+      .json({ sucess: true, message: "Xóa bài post thành công" });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({ message: error.message });
+  }
+};
+
+module.exports = { createPost, getPost, likePost, deletePost };

@@ -64,7 +64,54 @@ const getComment = async (req, res) => {
 };
 const getAllComment = async (req, res) => {};
 const updateComment = async (req, res) => {};
-const deleteComment = async (req, res) => {};
+const deleteComment = async (req, res) => {
+  try {
+    const vacationId = req.params.id;
+
+    const existingVacation = await vacationModel.findById(vacationId);
+    if (!existingVacation) {
+      return res.status(404).json({ message: "Không tìm thấy kỳ nghỉ" });
+    }
+
+    // Kiểm tra xem người đăng nhập có quyền xóa kỳ nghỉ không
+    if (req.userId.toString() !== existingVacation.createdBy.toString()) {
+      return res.status(403).json({
+        message: "Bạn không có quyền xóa kỳ nghỉ",
+      });
+    }
+
+    if (existingVacation.milestones?.length != 0) {
+      const listMilestoneId = existingVacation.milestones.map(
+        (item) => item._id
+      );
+      const getListPost = await postModel.find({
+        milestone: {
+          $in: listMilestoneId,
+        },
+      });
+      await postModel.deleteMany({
+        milestone: {
+          $in: listMilestoneId,
+        },
+      });
+
+      await commentModel.deleteMany({
+        postId: {
+          $in: getListPost.map((item) => item._id),
+        },
+      });
+    }
+
+    const deletedVacation = await vacationModel.findById(vacationId);
+
+    return res
+      .status(200)
+      .json({ sucess: true, message: "Xóa kỳ nghỉ thành công" });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({ message: error.message });
+  }
+};
 
 module.exports = {
   createComment,

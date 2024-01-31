@@ -40,7 +40,7 @@ const createMilestone = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res
-      .status(500)
+      .status(404)
       .json({ message: "Đã xảy ra lỗi trong quá trình tạo milestone" });
   }
 };
@@ -51,7 +51,7 @@ const getMilestone = async (req, res) => {
 
     const existingMilestone = await milestoneModel.findById(milestoneId);
     if (!existingMilestone) {
-      return res.status(404).json({ message: "Không tìm thấy kỳ nghỉ" });
+      return res.status(404).json({ message: "Không tìm thấy milestone" });
     }
 
     const milestone = await milestoneModel

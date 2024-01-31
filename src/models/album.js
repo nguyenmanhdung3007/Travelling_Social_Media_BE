@@ -7,7 +7,7 @@ const albumModel = new mongoose.Schema(
     desc: { type: String },
     images: [{ type: String }],
     vacation: [{ type: mongoose.Types.ObjectId, ref: "Vacations" }],
-    likes: [{ type: mongoose.Types.ObjectId, ref: "Users" }],
+    likes: { uId: [{ type: String }], total: { type: Number, default: 0 } },
     comments: [{ type: mongoose.Types.ObjectId, ref: "Comments" }],
     userTag: [{ type: mongoose.Types.ObjectId, ref: "Users" }],
     posts: [{ type: mongoose.Types.ObjectId, ref: "Posts" }],

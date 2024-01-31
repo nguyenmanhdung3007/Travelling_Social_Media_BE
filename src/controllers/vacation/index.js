@@ -1,6 +1,7 @@
 const vacationModel = require("../../models/vacation");
 const milestoneModel = require("../../models/milestone");
 const postModel = require("../../models/post");
+const commentModel = require("../../models/comment");
 const { vacationSchema } = require("../vacation/validation");
 const { createMilestone } = require("../milestone");
 const { finished } = require("nodemailer/lib/xoauth2");
@@ -118,7 +119,6 @@ const getAllVacations = async (req, res) => {
         updatedAt: -1,
       })
       .populate({ path: "createdBy", select: "-password" })
-      .populate("comments")
       .populate("milestones")
       .populate({ path: "userChoose", select: "-password" })
       .populate({ path: "participants", select: "-password" })
@@ -147,6 +147,7 @@ const createVacation = async (req, res) => {
       status,
       participants,
       milestones,
+      views,
     } = req.body;
 
     const validate = vacationSchema.validate({
@@ -189,6 +190,7 @@ const createVacation = async (req, res) => {
         userChoose,
         participants,
         status,
+        views,
       });
     } else if (privacy === "onlyMe") {
       vacation = await vacationModel.create({
@@ -200,6 +202,7 @@ const createVacation = async (req, res) => {
         participants,
         privacy,
         status,
+        views,
       });
     } else if (privacy === "public") {
       vacation = await vacationModel.create({
@@ -211,6 +214,7 @@ const createVacation = async (req, res) => {
         participants,
         privacy,
         status,
+        views
       });
     }
 
@@ -284,6 +288,7 @@ const updateVacation = async (req, res) => {
       userChoose,
       status,
       participants,
+      view
     } = req.body;
 
     const validate = vacationSchema.validate({
@@ -307,6 +312,8 @@ const updateVacation = async (req, res) => {
     existingVacation.status = status || existingVacation.status;
     existingVacation.participants =
       participants || existingVacation.participants;
+    existingVacation.views =
+      views || existingVacation.views;
 
     // Lưu kỳ nghỉ đã được cập nhật vào cơ sở dữ liệu
     const updatedVacation = await existingVacation.save();
@@ -325,7 +332,7 @@ const updateVacation = async (req, res) => {
 
 const finishVacation = async (req, res) => {
   try {
-    const vacationId = req.params._id;
+    const vacationId = req.params.id;
     const status = req.body.status;
 
     let statusUpdate = { status };
@@ -341,7 +348,7 @@ const finishVacation = async (req, res) => {
       });
     }
 
-    const finishVacation = await vacationModel.findOneAndUpdate(
+    const finishVacation = await vacationModel.findByIdAndUpdate(
       vacationId,
       statusUpdate,
       { new: true }
@@ -377,21 +384,28 @@ const deleteVacation = async (req, res) => {
     }
 
     if (existingVacation.milestones?.length != 0) {
-      for (let i = 0; i < existingVacation.milestones?.length; i++) {
-        const element = existingVacation.milestones[i];
-        const milestoneObj = await milestoneModel.findById(element);
-        console.log(milestoneObj._id);
-        if (milestoneObj?.posts?.length != 0) {
-          for (let i = 0; i < milestoneObj?.posts?.length; i++) {
-            const element = milestoneObj?.posts[i];
-            const postObj = await postModel.findById(element);
-            console.log(postObj._id);
-          }
-        }
-      }
+      const listMilestoneId = existingVacation.milestones.map(
+        (item) => item._id
+      );
+      const getListPost = await await postModel.find({
+        milestone: {
+          $in: listMilestoneId,
+        },
+      });
+      await postModel.deleteMany({
+        milestone: {
+          $in: listMilestoneId,
+        },
+      });
+
+      await commentModel.deleteMany({
+        postId: {
+          $in: getListPost.map((item) => item._id),
+        },
+      });
     }
 
-    const deletedVacation = await vacationModel.findById(vacationId);
+    const deletedVacation = await vacationModel.findByIdAndDelete(vacationId);
 
     return res
       .status(200)
