@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const milestoneModel = new mongoose.Schema(
   {
+    createdBy: { type: mongoose.Types.ObjectId, ref: "Users", required: true },
     time: {type: Date},
     desc: {type: String},
     vacation: {

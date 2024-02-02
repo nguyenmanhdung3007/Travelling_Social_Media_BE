@@ -14,12 +14,19 @@ const getPost = async (req, res) => {
     const post = await postModel
       .findById(postId)
       .populate("milestone")
+      .populate("vacation")
       .populate({ path: "postBy", select: "-password" })
-      .populate({ path: "comments", select: "-password" });
+      .populate({
+        path: "comments",
+        populate: {
+          path: "userId",
+          select: "fullName userName avatar",
+        },
+      });
 
     return res.status(200).json({
       sucess: true,
-      data: { post, query: req.query },
+      data: { post },
     });
   } catch (error) {
     console.log(error);
@@ -34,7 +41,6 @@ const createPost = async (req, res) => {
     const userId = req.userId;
     const { vacation, milestone, content, likes, comments } = req.body;
     const file = req.file;
-    console.log(req.body);
 
     const validate = postSchema.validate({
       vacation,
@@ -101,8 +107,6 @@ const createPost = async (req, res) => {
       return res.status(400).json({ error: "Loại tệp không được hỗ trợ" });
     }
 
-    // const data = await uploadImage(images);
-
     const post = await postModel.create({
       postBy: userId,
       vacation: vacation,
@@ -129,11 +133,47 @@ const createPost = async (req, res) => {
   }
 };
 
+const updatePost = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { content, postId } = req.body;
+
+    const existingPost = await postModel.findById(postId);
+    if (!existingPost) {
+      return res.status(404).json({ message: "Không tìm thấy bài post" });
+    }
+
+    // Kiểm tra xem người đăng nhập có quyền xóa bài post không
+    if (req.userId.toString() !== existingPost.postBy.toString()) {
+      return res.status(403).json({
+        message: "Bạn không thể sửa bài viết của người khác",
+      });
+    }
+
+    const updatedPost = await postModel.findByIdAndUpdate(
+      { _id: postId },
+      { content: content },
+      { new: true }
+    );
+
+    return res.status(200).json({
+      sucess: true,
+      message: "Đã chỉnh sửa bài viết thành công",
+      data: updatedPost,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      error: error.message,
+      message: "Đã xảy ra lỗi trong quá trình cập nhật bài viết",
+    });
+  }
+};
+
 const likePost = async (req, res) => {
   try {
     const postId = req.params.id;
     const userId = req.userId;
-    console.log(userId);
 
     const post = await postModel.findById(postId);
 
@@ -142,6 +182,7 @@ const likePost = async (req, res) => {
     }
 
     const vacation = await vacationModel.findById(post.vacation);
+    console.log(vacation);
 
     if (post.likes?.uId?.includes(userId)) {
       await postModel.updateOne(
@@ -149,35 +190,74 @@ const likePost = async (req, res) => {
         { $inc: { "likes.total": -1 }, $pull: { "likes.uId": userId } },
         { new: true }
       );
-      // await vacationModel.updateOne(
-      //   { _id: post.vacation },
-      //   { $inc: { "likes.total": -1 } },
-      //   { new: true }
-      // );
-      vacation.updateOne({ $inc: { "likes.total": -1 } });
+      await vacationModel.updateOne(
+        { _id: post.vacation },
+        { $inc: { "likes.total": -1 } },
+        { new: true }
+      );
     } else {
       await postModel.updateOne(
         { _id: postId },
         { $inc: { "likes.total": 1 }, $push: { "likes.uId": userId } },
         { new: true }
       );
-      // await vacationModel.updateOne(
-      //   { _id: post.vacation },
-      //   { $inc: { "likes.total": 1 } },
-      //   { new: true }
-      // );
-      vacation.updateOne({ $inc: { "likes.total": 1 } });
+      await vacationModel.updateOne(
+        { _id: post.vacation },
+        { $inc: { "likes.total": 1 } },
+        { new: true }
+      );
     }
-    await vacation.save();
-    console.log(vacation);
     return res.status(200).json({
       sucess: true,
       data: post,
     });
   } catch (error) {
     console.log(error);
-    return res.status(400).json({ error: error.message });
+    return res.status(400).json({
+      error: error.message,
+      message: "Đã xảy ra lỗi trong quá trình like bài viết",
+    });
   }
 };
 
-module.exports = { createPost, getPost, likePost };
+const deletePost = async (req, res) => {
+  try {
+    const postId = req.params.id;
+
+    const existingPost = await postModel.findById(postId);
+    if (!existingPost) {
+      return res.status(404).json({ message: "Không tìm thấy bài post" });
+    }
+
+    // Kiểm tra xem người đăng nhập có quyền xóa bài post không
+    if (req.userId.toString() !== existingPost.postBy.toString()) {
+      return res.status(403).json({
+        message: "Bạn không có quyền xóa bài post",
+      });
+    }
+
+    if (existingPost.comments?.length != 0) {
+      const getListComments = existingPost.comments.map((item) => item._id);
+
+      await commentModel.deleteMany({
+        postId: {
+          $in: getListPost,
+        },
+      });
+    }
+
+    const deletedPost = await postModel.findByIdAndDelete(postId);
+
+    return res
+      .status(200)
+      .json({ sucess: true, message: "Xóa bài post thành công" });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({
+      message: error.message,
+      message: "Đã xảy ra lỗi trong quá trình xóa bài viết",
+    });
+  }
+};
+
+module.exports = { createPost, getPost, likePost, deletePost, updatePost };

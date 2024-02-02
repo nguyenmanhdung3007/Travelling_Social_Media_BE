@@ -13,6 +13,7 @@ const getAllUser = async (req, res) => {
   }
 };
 
+
 const getUser = async (req, res) => {
   try {
     const userId = req.userId;
@@ -24,7 +25,7 @@ const getUser = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res.status(404).json({ message: error.message });
+    return res.status(404).json({ message: error.message, message: "Đã xảy ra lỗi trong quá trình lấy thông tin tất cả người dùng" });
   }
 };
 
@@ -88,7 +89,7 @@ const updateUser = async (req, res) => {
       user: user,
     });
   } catch (error) {
-    return res.status(404).json({ message: error.message });
+    return res.status(404).json({ message: error.message, message: "Đã xảy ra lỗi trong quá trình cập nhật người dùng" });
   }
 };
 
@@ -103,7 +104,7 @@ const deleteUser = async (req, res) => {
       user: user,
     });
   } catch (error) {
-    return res.status(404).json({ message: error.message });
+    return res.status(404).json({ message: error.message, message: "Đã xảy ra lỗi trong quá trình xóa tài khoản" });
   }
 };
 

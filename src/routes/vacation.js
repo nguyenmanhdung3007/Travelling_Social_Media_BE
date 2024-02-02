@@ -8,6 +8,7 @@ const {
   getVacationOnPageUser,
   finishVacation,
   getVacationInProgessOfUser,
+  deleteVacation,
 } = require("../controllers/vacation");
 const verifyToken = require("../middlewares/authentication");
 const upload = require("../util/multer");
@@ -19,10 +20,13 @@ router.post("/create",login, createVacation);
 router.get("/get-all-vacations/",login, getAllVacations);
 router.get("/detail/:id", getVacation);
 router.get("/:id", login,getVacationOnPageUser);
-router.get("/in-progess/:id",login, getVacationInProgessOfUser);
+router.get("/in-progess",login, getVacationInProgessOfUser);
 
 router.patch("/:id",login, updateVacation);
-router.patch("/finish/:id", finishVacation);
+router.patch("/finish/:id",login, finishVacation);
+
+
+router.delete("/delete/:id",login, deleteVacation);
 
 /*--MileStone--*/
 // router.post("/create/", createVacation);

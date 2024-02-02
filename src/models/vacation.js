@@ -8,7 +8,7 @@ const vacationModel = new mongoose.Schema(
     startedAt: { type: Date },
     endedAt: { type: Date },
     likes: { uId: [{ type: String }], total: { type: Number, default: 0 } },
-    comments: [{ type: mongoose.Types.ObjectId, ref: "Comments" }],
+    totalComment: { type: Number, default: 0 },
     // userTags: [{ type: mongoose.Types.ObjectId, ref: "Users" }],
     // posts: [{ type: mongoose.Types.ObjectId, ref: "Posts" }],
     milestones: [{ type: mongoose.Types.ObjectId, ref: "Milestones" }],
