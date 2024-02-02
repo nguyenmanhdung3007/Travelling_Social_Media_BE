@@ -41,7 +41,6 @@ const createPost = async (req, res) => {
     const userId = req.userId;
     const { vacation, milestone, content, likes, comments } = req.body;
     const file = req.file;
-    console.log(file);
 
     const validate = postSchema.validate({
       vacation,

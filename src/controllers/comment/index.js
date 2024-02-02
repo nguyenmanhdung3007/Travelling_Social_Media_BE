@@ -1,5 +1,6 @@
 const commentModel = require("../../models/comment");
 const postModel = require("../../models/post");
+const vacationModel = require("../../models/vacation");
 const { User } = require("../../models/user");
 
 const createComment = async (req, res) => {
@@ -8,7 +9,7 @@ const createComment = async (req, res) => {
     const postId = req.params.id;
     const { comment } = req.body;
     const userId = req.user;
-    console.log(userId)
+    console.log(userId);
 
     const post = await postModel.findById(postId);
 
@@ -21,7 +22,6 @@ const createComment = async (req, res) => {
     }
 
     const user = await User.findById(userId);
-    console.log(user);
     const from = user.userName;
 
     const newComment = await commentModel.create({
@@ -31,15 +31,24 @@ const createComment = async (req, res) => {
       postId: postId,
     });
 
+    // update số lượng comment trong vacationF
+    await vacationModel.updateOne(
+      { _id: post.vacation },
+      { $inc: { totalComment: 1 } },
+      { new: true }
+    );
+
     //updating the post with the comments id
     await post.comments.push(newComment._id);
-
     await post.save();
-
+    
     res.status(201).json(newComment);
   } catch (error) {
     console.log(error);
-    res.status(404).json({ message: error.message });
+    res.status(404).json({
+      message: error.message,
+      message: "Đã xảy ra lỗi trong quá trình tạo comment",
+    });
   }
 };
 const getComment = async (req, res) => {
@@ -49,7 +58,7 @@ const getComment = async (req, res) => {
     const comment = await commentModel
       .findById(commentId)
       .populate("post")
-      .populate({ path: "userId", select: "-password" })
+      .populate({ path: "userId", select: "-password" });
 
     return res.status(200).json({
       sucess: true,

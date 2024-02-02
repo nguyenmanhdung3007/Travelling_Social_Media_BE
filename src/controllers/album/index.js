@@ -5,6 +5,7 @@ const createAlbum = async (req, res) => {
   try {
     const userId = req.userId;
     const { title, privacy, images, userChoose } = req.body;
+    const file = req.file;
 
     const validate = albumSchema.validate({
       title,
@@ -15,11 +16,19 @@ const createAlbum = async (req, res) => {
       return res.status(400).json({ error: validate.error.message });
     }
 
+    let data;
+    if (file.mimetype.startsWith("image/")) {
+      data = await uploadImage(file);
+    } else {
+      return res.status(400).json({ error: "Loại tệp không được hỗ trợ" });
+    }
+
     if (privacy === "onlyUserChoose") {
       album = await albumModel.create({
         createdBy: userId,
         images,
         title,
+        thumbnail: data,
         privacy,
         userChoose,
       });
@@ -28,6 +37,7 @@ const createAlbum = async (req, res) => {
         createdBy: userId,
         images,
         title,
+        thumbnail: data,
         privacy,
       });
     }
