@@ -1,5 +1,6 @@
 const { albumSchema } = require("../album/validation");
 const albumModel = require("../../models/album");
+const { uploadImage, uploadVideo } = require("../../cloudinary");
 
 const createAlbum = async (req, res) => {
   try {
@@ -41,6 +42,7 @@ const createAlbum = async (req, res) => {
         privacy,
       });
     }
+ 
     return res.status(200).json({
       sucess: true,
       message: "Đã tạo album thành công",

@@ -5,7 +5,6 @@ const { User } = require("../../models/user");
 
 const createComment = async (req, res) => {
   try {
-    // const id = req.body;
     const postId = req.params.id;
     const { comment } = req.body;
     const userId = req.user;
@@ -83,7 +82,7 @@ const deleteComment = async (req, res) => {
       return res.status(404).json({ message: "Không tìm thấy comment" });
     }
 
-    // Kiểm tra xem người đăng nhập có quyền xóa kỳ nghỉ không
+    // Kiểm tra xem người đăng nhập có quyền xóa comment không
     if (req.userId.toString() !== existingComment.from.toString()) {
       return res.status(403).json({
         message: "Bạn không có quyền xóa comment",

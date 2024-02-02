@@ -79,7 +79,8 @@ const getVacationInProgessOfUser = async (req, res) => {
 
     const vacation = await vacationModel
       .find({
-        $and: [{ createdBy: userId }, { status: "In Progress" }],
+        status: "In Progress",
+        $or: [{ createdBy: userId }, { participants: userId }],
       })
       .populate("milestones")
       .populate({ path: "userChoose", select: "-password" })
@@ -285,7 +286,7 @@ const updateVacation = async (req, res) => {
       participants || existingVacation.participants;
     existingVacation.views = views || existingVacation.views;
 
-    // Lưu kỳ nghỉ đã được cập nhật vào cơ sở dữ liệu
+    // Lưu kỳ nghỉ đã được cập nhật
     const updatedVacation = await existingVacation.save();
 
     // Trả về thông tin của kỳ nghỉ đã cập nhật
