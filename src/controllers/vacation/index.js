@@ -166,16 +166,6 @@ const createVacation = async (req, res) => {
         .json({ message: "Ngày kết thúc không thể trước ngày bắt đầu." });
     }
 
-    // const user = User.findById(userId);
-    // console.log(user.vacations?.inProgess?.length != 0)
-    // if (user.vacations?.inProgess?.length != 0) {
-    //   return res
-    //     .status(400)
-    //     .json({
-    //       message: "Bạn không thể tạo thêm kỳ nghỉ của bạn chưa kết thúc",
-    //     });
-    // }
-
     if (privacy === "onlyUserChoose") {
       vacation = await vacationModel.create({
         createdBy: userId,
@@ -189,19 +179,7 @@ const createVacation = async (req, res) => {
         status,
         views,
       });
-    } else if (privacy === "onlyMe") {
-      vacation = await vacationModel.create({
-        createdBy: userId,
-        desc,
-        title,
-        startedAt,
-        endedAt,
-        participants,
-        privacy,
-        status,
-        views,
-      });
-    } else if (privacy === "public") {
+    } else if (privacy === "onlyMe" || privacy === "public") {
       vacation = await vacationModel.create({
         createdBy: userId,
         desc,
@@ -230,6 +208,7 @@ const createVacation = async (req, res) => {
             .json({ message: "Thời gian nằm ngoài kỳ nghỉ. Hãy nhập lại" });
         }
         const milestone = await milestoneModel.create({
+          createdBy: userId,
           time,
           desc,
           vacation: vacationId,
@@ -238,11 +217,6 @@ const createVacation = async (req, res) => {
         await vacation.save();
       }
     }
-
-    // await User.findOneAndUpdate(
-    //   { _id: userId },
-    //   { $push: { "vacations.inProgess": vacation._id } }
-    // );
 
     res.status(200).json({
       sucess: true,

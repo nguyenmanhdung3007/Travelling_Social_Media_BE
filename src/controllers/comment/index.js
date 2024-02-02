@@ -64,24 +64,25 @@ const getComment = async (req, res) => {
 };
 const getAllComment = async (req, res) => {};
 const updateComment = async (req, res) => {};
+
 const deleteComment = async (req, res) => {
   try {
-    const vacationId = req.params.id;
+    const commentId = req.params.id;
 
-    const existingVacation = await vacationModel.findById(vacationId);
-    if (!existingVacation) {
-      return res.status(404).json({ message: "Không tìm thấy kỳ nghỉ" });
+    const existingComment = await commentModel.findById(commentId);
+    if (!existingComment) {
+      return res.status(404).json({ message: "Không tìm thấy comment" });
     }
 
     // Kiểm tra xem người đăng nhập có quyền xóa kỳ nghỉ không
-    if (req.userId.toString() !== existingVacation.createdBy.toString()) {
+    if (req.userId.toString() !== existingComment.from.toString()) {
       return res.status(403).json({
-        message: "Bạn không có quyền xóa kỳ nghỉ",
+        message: "Bạn không có quyền xóa comment",
       });
     }
 
-    if (existingVacation.milestones?.length != 0) {
-      const listMilestoneId = existingVacation.milestones.map(
+    if (existingComment.milestones?.length != 0) {
+      const listMilestoneId = existingComment.milestones.map(
         (item) => item._id
       );
       const getListPost = await postModel.find({
@@ -102,7 +103,7 @@ const deleteComment = async (req, res) => {
       });
     }
 
-    const deletedVacation = await vacationModel.findById(vacationId);
+    const deletedVacation = await commentModel.findById(commentId);
 
     return res
       .status(200)
