@@ -145,7 +145,7 @@ exports.forgetPass = async (req, res) => {
   await SendEmail(
     user.email,
     "Hello User",
-    `${n}, Link: http://https://travelling-social-media-fe.vercel.app//changepass/${user._id}`
+    `${n}, Link: https://travelling-social-media-fe.vercel.app/changepass/${user._id}`
   );
   await User.findOneAndUpdate(
     { email: user.email },
