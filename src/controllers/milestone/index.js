@@ -127,40 +127,36 @@ const deleteMilestone = async (req, res) => {
     }
 
     if (existingMilestone.posts?.length != 0) {
-      const listPostId = existingMilestone.posts.map(
-        (item) => item._id
-      );
+      const listPostId = existingMilestone.posts.map((item) => item._id);
       const getListComments = await commentModel.find({
         postId: {
           $in: listPostId,
         },
       });
-      await postModel.deleteMany({
+      await postModel.find({
         _id: {
           $in: listPostId,
         },
       });
 
-      await commentModel.deleteMany({
+      await commentModel.find({
         postId: {
           $in: listPostId.map((item) => item._id),
         },
       });
     }
 
-    const deletedVacation = await vacationModel.findByIdAndDelete(milestoneId);
+    const deletedVacation = await vacationModel.findById(milestoneId);
 
     return res
       .status(200)
       .json({ sucess: true, message: "Xóa kỳ nghỉ thành công" });
   } catch (error) {
     console.log(error);
-    res
-      .status(404)
-      .json({
-        message: error.message,
-        message: "Đã xảy ra lỗi trong quá trình xóa kỳ nghỉ",
-      });
+    res.status(404).json({
+      message: error.message,
+      message: "Đã xảy ra lỗi trong quá trình xóa kỳ nghỉ",
+    });
   }
 };
 

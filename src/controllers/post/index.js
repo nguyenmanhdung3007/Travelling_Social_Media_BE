@@ -117,6 +117,9 @@ const createPost = async (req, res) => {
       images: data,
     });
 
+    existingVacation.posts.push(post);
+    existingVacation.save();
+
     const milestoneObj = await milestoneModel.findById(milestoneId);
 
     milestoneObj.posts.push(post);
@@ -245,6 +248,12 @@ const deletePost = async (req, res) => {
         },
       });
     }
+
+    await vacationModel.updateOne(
+      { _id: existingPost.vacation.toString() },
+      { $pull: { posts: postId } },
+      { new: true }
+    );
 
     const deletedPost = await postModel.findByIdAndDelete(postId);
 
