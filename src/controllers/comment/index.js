@@ -83,35 +83,13 @@ const deleteComment = async (req, res) => {
     }
 
     // Kiểm tra xem người đăng nhập có quyền xóa comment không
-    if (req.userId.toString() !== existingComment.from.toString()) {
+    if (req.userId.toString() !== existingComment.userId.toString()) {
       return res.status(403).json({
         message: "Bạn không có quyền xóa comment",
       });
     }
 
-    if (existingComment.milestones?.length != 0) {
-      const listMilestoneId = existingComment.milestones.map(
-        (item) => item._id
-      );
-      const getListPost = await postModel.find({
-        milestone: {
-          $in: listMilestoneId,
-        },
-      });
-      await postModel.deleteMany({
-        milestone: {
-          $in: listMilestoneId,
-        },
-      });
-
-      await commentModel.deleteMany({
-        postId: {
-          $in: getListPost.map((item) => item._id),
-        },
-      });
-    }
-
-    const deletedVacation = await commentModel.findById(commentId);
+    const deletedComment = await commentModel.findById(commentId);
 
     return res
       .status(200)

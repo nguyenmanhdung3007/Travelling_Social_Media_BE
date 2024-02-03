@@ -14,6 +14,7 @@ const getVacation = async (req, res) => {
     const vacation = await vacationModel
       .findById(vacationId)
       .populate("milestones")
+      .populate("posts")
       .populate({
         path: "milestones",
         populate: {
@@ -304,6 +305,37 @@ const updateVacation = async (req, res) => {
   }
 };
 
+const getPostFromVacation = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const {vacationId} = req.body
+
+    const vacation = await vacationModel.findById(vacationId).populate('posts');
+
+    if (!vacation) {
+      return res.status(404).json({ message: "Không tìm thấy kỳ nghỉ" });
+    }
+    console.log(vacation);
+
+    const posts = vacation.posts;
+    console.log(posts);
+
+    if (!posts) {
+      return res.status(404).json({ message: "Không tìm thấy bài post nào" });
+    }
+
+    return res.status(200).json({
+      sucess: true,
+      data: posts,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(404)
+      .json({ message: "Đã xảy ra lỗi trong quá trình load các bài posts" });
+  }
+};
+
 const finishVacation = async (req, res) => {
   try {
     const vacationId = req.params.id;
@@ -364,7 +396,7 @@ const deleteVacation = async (req, res) => {
       const listMilestoneId = existingVacation.milestones.map(
         (item) => item._id
       );
-      const getListPost = await await postModel.find({
+      const getListPost = await postModel.find({
         milestone: {
           $in: listMilestoneId,
         },
@@ -411,4 +443,5 @@ module.exports = {
   updateVacation,
   finishVacation,
   deleteVacation,
+  getPostFromVacation,
 };

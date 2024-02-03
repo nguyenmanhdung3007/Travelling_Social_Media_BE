@@ -10,7 +10,7 @@ const vacationModel = new mongoose.Schema(
     likes: { uId: [{ type: String }], total: { type: Number, default: 0 } },
     totalComment: { type: Number, default: 0 },
     // userTags: [{ type: mongoose.Types.ObjectId, ref: "Users" }],
-    // posts: [{ type: mongoose.Types.ObjectId, ref: "Posts" }],
+    posts: [{ type: mongoose.Types.ObjectId, ref: "Posts" }],
     milestones: [{ type: mongoose.Types.ObjectId, ref: "Milestones" }],
     privacy: {
       type: String,
