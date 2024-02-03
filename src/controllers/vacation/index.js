@@ -58,6 +58,7 @@ const getVacationOnPageUser = async (req, res) => {
         ],
       })
       .populate("milestones")
+      .populate({ path: "createdBy", select: "-password" })
       .populate({ path: "userChoose", select: "-password" })
       .populate({ path: "participants", select: "-password" });
 
@@ -84,6 +85,7 @@ const getVacationInProgessOfUser = async (req, res) => {
         $or: [{ createdBy: userId }, { participants: userId }],
       })
       .populate("milestones")
+      .populate({ path: "createdBy", select: "-password" })
       .populate({ path: "userChoose", select: "-password" })
       .populate({ path: "participants", select: "-password" });
 
